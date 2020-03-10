@@ -1,0 +1,40 @@
+{
+    "name": "Phaser3-Test",
+    "version": "0.0.0",
+    "description": "",
+    "author": "Teamtailor",
+    "main": "index.js",
+    "scripts": {
+        "start": "webpack --mode=development",
+        "build": "webpack  --mode=production --config webpack.production.config.js",
+        "test": "eslint ./src/**/**.js",
+        "lint": "eslint src --max-warnings 0",
+        "lintfix": "yarn lint -- --fix"
+    },
+    "license": "MIT",
+    "devDependencies": {
+        "@babel/core": "^7.8.7",
+        "@babel/polyfill": "^7.8.7",
+        "@babel/preset-env": "^7.8.7",
+        "babel-eslint": "^10.1.0",
+        "babel-loader": "^8.0.6",
+        "browser-sync": "^2.26.7",
+        "browser-sync-webpack-plugin": "^2.2.2",
+        "clean-webpack-plugin": "^3.0.0",
+        "copy-webpack-plugin": "^5.1.1",
+        "eslint": "^6.8.0",
+        "eslint-config-standard": "^14.1.0",
+        "eslint-plugin-import": "^2.20.1",
+        "eslint-plugin-node": "^11.0.0",
+        "eslint-plugin-promise": "^4.2.1",
+        "eslint-plugin-standard": "^4.0.1",
+        "expose-loader": "^0.7.5",
+        "html-webpack-plugin": "^3.2.0",
+        "raw-loader": "^4.0.0",
+        "webpack": "^4.42.0",
+        "webpack-cli": "^3.3.11"
+    },
+    "dependencies": {
+        "phaser": "3.12.0"
+    }
+}
