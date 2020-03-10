@@ -26,23 +26,42 @@ class GameScene extends Phaser.Scene {
       },
       isStatic: true,
       isSensor: true,
-      onCollideEndCallback: this.collisionStop.bind(this)
+      label: 'ground',
+      onCollideCallback: this.enteringGround.bind(this),
+      onCollideEndCallback: this.leavingGround.bind(this)
     });
 
     this.createPlayers();
   }
 
-  async collisionStop({
-    bodyB
-  }) {
-    console.log({
-      bodyB
-    });
-    const [playerToDie] = this.players.filter(p => p.matterObj.body === bodyB);
+  getPlayerFromBody(body) {
+    const [player] = this.players.filter(p => p.matterObj.body === body);
+    return player;
+  }
 
-    await playerToDie.die();
-    this.players = this.players.filter(p => p !== playerToDie);
-    playerToDie.destroy();
+  enteringGround({
+    bodyA, bodyB
+  }) {
+    const player = this.getPlayerFromBody(bodyB);
+    player.addToGround(bodyA);
+  }
+
+  async leavingGround({
+    bodyA, bodyB
+  }) {
+    const player = this.getPlayerFromBody(bodyB);
+    player.removeFromGround(bodyA);
+
+    await player.finishBoosting();
+    if (!player.isOnAnyGround()) {
+      this.killPlayer(player);
+    }
+  }
+
+  async killPlayer(player) {
+    await player.die();
+    this.players = this.players.filter(p => p !== player);
+    player.destroy();
   }
 
   createPlayers() {
