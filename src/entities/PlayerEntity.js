@@ -1,10 +1,7 @@
 export default class PlayerEntity {
-  constructor(
-    scene,
-    {
-      image = 'avatar1', color = 0xf43f85, controls, ground
-    }
-  ) {
+  constructor(scene, {
+    image = 'avatar1', color = 0xf43f85, controls
+  }) {
     this.scene = scene;
     this.grounds = [];
 

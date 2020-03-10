@@ -77,8 +77,7 @@ class GameScene extends Phaser.Scene {
           left: 'left',
           right: 'right',
           boost: 'space'
-        },
-        ground: this.ground
+        }
       })
     );
 
@@ -92,39 +91,34 @@ class GameScene extends Phaser.Scene {
           down: 's',
           right: 'd',
           boost: 'r'
-        },
-        ground: this.ground
+        }
       })
     );
 
     this.players.push(
       new PlayerEntity(this, {
         image: 'adrian',
-        color: 0xff0000,
-        ground: this.ground
+        color: 0xff0000
       })
     );
 
     this.players.push(
       new PlayerEntity(this, {
         image: 'ramya',
-        color: 0xff0000,
-        ground: this.ground
+        color: 0xff0000
       })
     );
 
     this.players.push(
       new PlayerEntity(this, {
-        color: 0xff0000,
-        ground: this.ground
+        color: 0xff0000
       })
     );
 
     this.players.push(
       new PlayerEntity(this, {
         image: 'avatar2',
-        color: 0xff0000,
-        ground: this.ground
+        color: 0xff0000
       })
     );
   }
