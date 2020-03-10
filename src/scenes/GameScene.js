@@ -70,7 +70,7 @@ class GameScene extends Phaser.Scene {
     this.players.push(
       new PlayerEntity(this, {
         image: 'rikard',
-        color: 0xf43f85,
+        color: 0xffffff * Math.random(),
         controls: {
           up: 'up',
           down: 'down',
@@ -84,41 +84,46 @@ class GameScene extends Phaser.Scene {
     this.players.push(
       new PlayerEntity(this, {
         image: 'anders',
-        color: 0xff0000,
+        color: 0xffffff * Math.random(),
         controls: {
           up: 'w',
           left: 'a',
           down: 's',
           right: 'd',
           boost: 'r'
-        }
+        },
+        useTankControls: true
       })
     );
 
     this.players.push(
       new PlayerEntity(this, {
         image: 'adrian',
-        color: 0xff0000
+        color: 0xffffff * Math.random(),
+        controls: {
+          boost: 'b'
+        },
+        useMouse: true
       })
     );
 
     this.players.push(
       new PlayerEntity(this, {
         image: 'ramya',
-        color: 0xff0000
+        color: 0xffffff * Math.random()
       })
     );
 
     this.players.push(
       new PlayerEntity(this, {
-        color: 0xff0000
+        color: 0xffffff * Math.random()
       })
     );
 
     this.players.push(
       new PlayerEntity(this, {
         image: 'avatar2',
-        color: 0xff0000
+        color: 0xffffff * Math.random()
       })
     );
   }

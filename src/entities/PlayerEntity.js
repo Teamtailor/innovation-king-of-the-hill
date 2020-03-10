@@ -1,9 +1,14 @@
 export default class PlayerEntity {
-  constructor(scene, {
-    image = 'avatar1', color = 0xf43f85, controls
-  }) {
+  constructor(
+    scene,
+    {
+      image = 'avatar1', color = 0xf43f85, controls, useMouse, useTankControls
+    }
+  ) {
     this.scene = scene;
     this.grounds = [];
+    this.useMouse = useMouse;
+    this.useTankControls = useTankControls;
 
     this.maskShape = scene.make
       .graphics()
@@ -20,12 +25,20 @@ export default class PlayerEntity {
     this.matterObj = scene.matter.add.image(
       scene.game.config.width / 2,
       scene.game.config.height / 2,
-      image
+      image,
+      null,
+      {
+        label: 'player-' + image,
+        shape: {
+          type: 'circle',
+          radius: 24
+        },
+        frictionAir: 0.2,
+        restitution: 1,
+        density: 0.005
+      }
     );
-    this.matterObj.setCircle(24);
-    this.matterObj.setDensity(0.005);
-    this.matterObj.setFriction(0.2, 0.2);
-    this.matterObj.setBounce(1);
+
     this.matterObj.setMask(this.maskShape.createGeometryMask());
 
     this.strength = 1;
@@ -36,38 +49,113 @@ export default class PlayerEntity {
     this.keys = scene.input.keyboard.addKeys(controls);
   }
 
-  getAvailableStrength(delta) {
-    return (this.strength * 1 - this.fatigue) * (delta / (1000 / 60));
+  updateAvailableStrength(delta) {
+    this.availableStrength =
+      (this.strength * 1 - this.fatigue) * (delta / (1000 / 60));
   }
 
-  readController(delta) {
-    const availableStrength = this.getAvailableStrength(delta);
-
-    if (this.fatigue > 0) {
-      this.fatigue -= ((delta / (1000 / 60)) * 0.5) / 60;
-      if (this.fatigue < 0) this.fatigue = 0;
-    }
-
-    if (this.disableController || !availableStrength) {
-      return;
-    }
-
+  readMouse(delta, boost) {
     const {
-      up = {}, down = {}, left = {}, right = {}, boost = {}
+      position, buttons
+    } = this.scene.input.activePointer;
+
+    if (buttons === 1) {
+      const relPos = new Phaser.Math.Vector2(position).subtract(
+        new Phaser.Math.Vector2(this.matterObj.x, this.matterObj.y)
+      );
+
+      const distance = relPos.distance(new Phaser.Math.Vector2(0, 0));
+
+      if (distance > 10) {
+        const force = new Phaser.Math.Vector2(relPos)
+          .normalize()
+          .multiply(
+            new Phaser.Math.Vector2(
+              0.05 * this.availableStrength,
+              0.05 * this.availableStrength
+            )
+          );
+
+        this.matterObj.applyForce(force);
+
+        if (boost) {
+          const boostForce = new Phaser.Math.Vector2(force)
+            .normalize()
+            .multiply(new Phaser.Math.Vector2(boost, boost));
+
+          this.matterObj.applyForce(boostForce);
+        }
+      }
+    }
+  }
+
+  readTankControls(delta, boost) {
+    const {
+      up = {}, down = {}, left = {}, right = {}
     } = this.keys;
 
+    let thrust = 0;
+
     if (up.isDown) {
-      this.matterObj.thrustLeft(0.05 * availableStrength);
+      thrust += 0.05 * this.availableStrength;
     }
     if (down.isDown) {
-      this.matterObj.thrustLeft(-0.05 * availableStrength);
+      thrust += -0.05 * this.availableStrength;
     }
     if (left.isDown && !this.boosting) {
-      this.matterObj.setAngularVelocity(-0.1 * availableStrength);
+      this.matterObj.setAngularVelocity(-0.1 * this.availableStrength);
     }
     if (right.isDown && !this.boosting) {
-      this.matterObj.setAngularVelocity(0.1 * availableStrength);
+      this.matterObj.setAngularVelocity(0.1 * this.availableStrength);
     }
+
+    if (boost) {
+      if (up.isDown) {
+        thrust += boost;
+      }
+      if (down.isDown) {
+        thrust += -boost;
+      }
+    }
+
+    this.matterObj.thrustLeft(thrust);
+  }
+
+  readPushControls(delta, boost) {
+    const {
+      up = {}, down = {}, left = {}, right = {}
+    } = this.keys;
+
+    const force = new Phaser.Math.Vector2(0, 0);
+
+    if (up.isDown) {
+      force.add(new Phaser.Math.Vector2(0.0, -0.05 * this.availableStrength));
+    }
+    if (down.isDown) {
+      force.add(new Phaser.Math.Vector2(0.0, 0.05 * this.availableStrength));
+    }
+    if (left.isDown) {
+      force.add(new Phaser.Math.Vector2(-0.05 * this.availableStrength, 0));
+    }
+    if (right.isDown) {
+      force.add(new Phaser.Math.Vector2(0.05 * this.availableStrength, 0));
+    }
+
+    this.matterObj.applyForce(force);
+
+    if (boost) {
+      const boostForce = new Phaser.Math.Vector2(force)
+        .normalize()
+        .multiply(new Phaser.Math.Vector2(boost, boost));
+
+      this.matterObj.applyForce(boostForce);
+    }
+  }
+
+  readBoost(delta) {
+    const {
+      boost = {}
+    } = this.keys;
 
     if (boost.isDown && !this.boosting) {
       this.chargingBoost = true;
@@ -88,8 +176,31 @@ export default class PlayerEntity {
         }
       });
 
-      this.matterObj.thrustLeft(0.5 * availableStrength);
       this.fatigue += this.fatigue < 1 - 0.2 ? 0.2 : 1 - this.fatigue;
+      return 0.5 * this.availableStrength;
+    }
+
+    return 0;
+  }
+
+  readController(delta) {
+    if (this.fatigue > 0) {
+      this.fatigue -= ((delta / (1000 / 60)) * 0.5) / 60;
+      if (this.fatigue < 0) this.fatigue = 0;
+    }
+
+    if (this.disableController) {
+      return;
+    }
+
+    const boost = this.readBoost(delta);
+
+    if (this.useMouse) {
+      this.readMouse(delta, boost);
+    } else if (this.useTankControls) {
+      this.readTankControls(delta, boost);
+    } else {
+      this.readPushControls(delta, boost);
     }
   }
 
@@ -99,8 +210,9 @@ export default class PlayerEntity {
         return resolve();
       }
 
-      setInterval(() => {
+      const interval = setInterval(() => {
         if (this.boosting === false) {
+          clearInterval(interval);
           resolve();
         }
       }, 10);
@@ -154,6 +266,7 @@ export default class PlayerEntity {
   }
 
   update(time, delta) {
+    this.updateAvailableStrength(delta);
     this.updateMask();
     this.readController(delta);
   }
