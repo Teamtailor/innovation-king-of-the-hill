@@ -51,7 +51,7 @@
     "func-call-spacing": ["error", "never"],
     "indent": [
       "error",
-      4,
+      2,
       {
         "SwitchCase": 1
       }
