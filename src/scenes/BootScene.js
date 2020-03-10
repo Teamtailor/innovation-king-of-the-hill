@@ -1,4 +1,4 @@
-import GameScene from './GameScene';
+import MainMenuScene from './menu/MainMenuScene';
 
 class BootScene extends Phaser.Scene {
   constructor() {
@@ -54,8 +54,8 @@ class BootScene extends Phaser.Scene {
   }
 
   create() {
-    this.scene.add('GameScene', GameScene);
-    this.scene.start('GameScene');
+    this.scene.add('MainMenuScene', MainMenuScene);
+    this.scene.start('MainMenuScene');
   }
 }
 
