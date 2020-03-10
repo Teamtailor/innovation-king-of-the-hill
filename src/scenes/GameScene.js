@@ -1,4 +1,5 @@
 import PlayerEntity from '../entities/PlayerEntity';
+import GroundEntity from '../entities/GroundEntity';
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -10,17 +11,18 @@ class GameScene extends Phaser.Scene {
     preload() {}
 
     create() {
-        this.ground = this.matter.add.rectangle(
-            this.game.config.width / 2,
-            this.game.config.height / 2,
-            600,
-            600,
-            {
-                isStatic: true,
-                isSensor: true,
-                onCollideEndCallback: this.collisionStop.bind(this)
-            }
-        );
+        const ground = new GroundEntity();
+        const poly = this.add.polygon(this.game.config.width / 2, this.game.config.height / 2, ground.getPath(), 0xff0000);
+
+        this.matter.add.gameObject(poly, {
+            shape: {
+                type: 'fromVerts',
+                verts: ground.getPath()
+            },
+            isStatic: true,
+            isSensor: true,
+            onCollideEndCallback: this.collisionStop.bind(this)
+        });
 
         this.createPlayers();
     }
