@@ -32,6 +32,20 @@ class GameScene extends Phaser.Scene {
     });
 
     this.createPlayers();
+    this.createInstructions();
+  }
+
+  createInstructions() {
+    this.add.text(
+      10,
+      10,
+      'Controls:\nPush: Arrows & Space\nTank: WASD & R\nMouse: Click & B',
+      {
+        fontFamily: 'Arial',
+        fontSize: 12,
+        color: '#00ff00'
+      }
+    );
   }
 
   getPlayerFromBody(body) {
