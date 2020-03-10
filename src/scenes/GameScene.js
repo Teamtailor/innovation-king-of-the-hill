@@ -25,13 +25,15 @@ class GameScene extends Phaser.Scene {
         this.createPlayers();
     }
 
-    collisionStop({
+    async collisionStop({
         bodyB
     }) {
         const [playerToDie] = this.players.filter(
             p => p.matterObj.body === bodyB
         );
-        // this.players = this.players.filter(p => p !== playerToDie);
+
+        await playerToDie.die();
+        this.players = this.players.filter(p => p !== playerToDie);
         playerToDie.destroy();
     }
 

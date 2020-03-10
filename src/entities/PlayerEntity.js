@@ -37,6 +37,7 @@ export default class PlayerEntity {
         if (this.disableController) {
             return;
         }
+
         const {
             up = {},
             down = {},
@@ -83,25 +84,32 @@ export default class PlayerEntity {
     }
 
     destroy() {
-        this.scene.tweens.add({
-            targets: [this.matterObj, this.maskShape, this.border],
-            scale: 0,
-            ease: 'Power1',
-            duration: 1000,
-            yoyo: false,
-            repeat: 0
-        });
-
-        this.matterObj.setFriction(0, 0, 0);
-
-        this.matterObj.setVelocity(0);
-        this.matterObj.setAngularVelocity(0.2);
-
-        this.disableController = true;
-
-        /* this.matterObj.destroy();
+        this.matterObj.destroy();
         this.border.destroy();
-        this.maskShape.destroy(); */
+        this.maskShape.destroy();
+    }
+
+    die() {
+        return new Promise(resolve => {
+            this.scene.tweens.add({
+                targets: [this.matterObj, this.maskShape, this.border],
+                scale: 0,
+                ease: 'Sine.easeIn',
+                duration: 1000,
+                yoyo: false,
+                repeat: 0,
+                onComplete: () => {
+                    resolve();
+                }
+            });
+
+            this.matterObj.setCollisionCategory(0);
+            this.matterObj.setFriction(0, 0, 0);
+            this.matterObj.setVelocity(0);
+            this.matterObj.setAngularVelocity(0.2);
+
+            this.disableController = true;
+        });
     }
 
     update(time, delta) {
