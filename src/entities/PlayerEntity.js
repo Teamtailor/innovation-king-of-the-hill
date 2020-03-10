@@ -30,11 +30,25 @@ export default class PlayerEntity {
         this.matterObj.setBounce(1);
         this.matterObj.setMask(this.maskShape.createGeometryMask());
 
+        this.strength = 1;
+        this.fatigue = 0;
+
         this.keys = scene.input.keyboard.addKeys(controls);
     }
 
+    getAvailableStrength(delta) {
+        return (this.strength * 1 - this.fatigue) * (delta / (1000 / 60));
+    }
+
     readController(delta) {
-        if (this.disableController) {
+        const availableStrength = this.getAvailableStrength(delta);
+
+        if (this.fatigue > 0) {
+            this.fatigue -= ((delta / (1000 / 60)) * 0.5) / 60;
+            if (this.fatigue < 0) this.fatigue = 0;
+        }
+
+        if (this.disableController || !availableStrength) {
             return;
         }
 
@@ -47,33 +61,55 @@ export default class PlayerEntity {
         } = this.keys;
 
         if (up.isDown) {
-            this.matterObj.applyForce(new Phaser.Math.Vector2(0.0, -0.05));
+            this.matterObj.applyForce(
+                new Phaser.Math.Vector2(0.0, -0.05 * availableStrength)
+            );
         }
         if (down.isDown) {
-            this.matterObj.applyForce(new Phaser.Math.Vector2(0.0, 0.05));
+            this.matterObj.applyForce(
+                new Phaser.Math.Vector2(0.0, 0.05 * availableStrength)
+            );
         }
         if (left.isDown) {
-            this.matterObj.applyForce(new Phaser.Math.Vector2(-0.05, 0));
+            this.matterObj.applyForce(
+                new Phaser.Math.Vector2(-0.05 * availableStrength, 0)
+            );
         }
         if (right.isDown) {
-            this.matterObj.applyForce(new Phaser.Math.Vector2(0.05, 0));
+            this.matterObj.applyForce(
+                new Phaser.Math.Vector2(0.05 * availableStrength, 0)
+            );
         }
+
         if (boost.isDown) {
             this.boosting = true;
         }
         if (boost.isUp && this.boosting) {
-            this.boosting = false;
             if (up.isDown) {
-                this.matterObj.applyForce(new Phaser.Math.Vector2(0.0, -0.5));
+                this.matterObj.applyForce(
+                    new Phaser.Math.Vector2(0.0, -0.5 * availableStrength)
+                );
             }
             if (down.isDown) {
-                this.matterObj.applyForce(new Phaser.Math.Vector2(0.0, 0.5));
+                this.matterObj.applyForce(
+                    new Phaser.Math.Vector2(0.0, 0.5 * availableStrength)
+                );
             }
             if (left.isDown) {
-                this.matterObj.applyForce(new Phaser.Math.Vector2(-0.5, 0));
+                this.matterObj.applyForce(
+                    new Phaser.Math.Vector2(-0.5 * availableStrength, 0)
+                );
             }
             if (right.isDown) {
-                this.matterObj.applyForce(new Phaser.Math.Vector2(0.5, 0));
+                this.matterObj.applyForce(
+                    new Phaser.Math.Vector2(0.5 * availableStrength, 0)
+                );
+            }
+
+            this.boosting = false;
+
+            if (up.isDown || down.isDown || left.isDown || right.isDown) {
+                this.fatigue += this.fatigue < 1 - 0.2 ? 0.2 : 1 - this.fatigue;
             }
         }
     }
