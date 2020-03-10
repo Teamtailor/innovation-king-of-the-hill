@@ -8,8 +8,8 @@ window.Phaser = Phaser;
 const config = {
     // For more settings see <https://github.com/photonstorm/phaser/blob/master/src/boot/Config.js>
     type: Phaser.WEBGL,
-    pixelArt: true,
-    roundPixels: true,
+    pixelArt: false,
+    roundPixels: false,
     parent: 'content',
     width: constants.WIDTH,
     height: constants.HEIGHT,
@@ -20,7 +20,7 @@ const config = {
                 x: 0,
                 y: 0
             },
-            debug: true
+            debug: false
         }
     },
     scene: [BootScene]

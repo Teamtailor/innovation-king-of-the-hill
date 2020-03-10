@@ -1,4 +1,4 @@
-import TitleScene from './TitleScene';
+import GameScene from './GameScene';
 
 class BootScene extends Phaser.Scene {
     constructor() {
@@ -25,13 +25,37 @@ class BootScene extends Phaser.Scene {
             progress.destroy();
         });
 
-        this.load.setPath('assets/images/');
-        this.load.image('teamtailor', 'teamtailor.png');
+        for (var i = 0; i < 10; i++) {
+            this.load.image(
+                'avatar' + i,
+                '//robohash.org/' + i + '?size=48x48'
+            );
+        }
+
+        this.load.image(
+            'rikard',
+            '//res.cloudinary.com/teamtailor/image/upload/c_thumb,f_auto,h_48,q_auto,w_48/v1579613249/eeld6pvvmqdr62rrm872'
+        );
+
+        this.load.image(
+            'anders',
+            '//res.cloudinary.com/teamtailor/image/upload/c_thumb,f_auto,h_48,q_auto,w_48/v1558438753/vb6clw0qtuip4d42bhxw'
+        );
+
+        this.load.image(
+            'adrian',
+            '//res.cloudinary.com/teamtailor/image/upload/c_thumb,f_auto,h_48,q_auto,w_48/v1582796431/ct7zszureniopzzldgdz'
+        );
+
+        this.load.image(
+            'ramya',
+            '//res.cloudinary.com/teamtailor/c_thumb,f_auto,h_48,q_auto,w_48/v1568805770/ojwnlxauurjdhp3bpby3'
+        );
     }
 
     create() {
-        this.scene.add('TitleScene', TitleScene);
-        this.scene.start('TitleScene');
+        this.scene.add('GameScene', GameScene);
+        this.scene.start('GameScene');
     }
 }
 
