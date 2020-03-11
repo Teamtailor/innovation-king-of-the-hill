@@ -1,7 +1,7 @@
 import Grow from '../entities/power-ups/Grow';
 
-const MIN_SPAWN_TIME = 4200;
-const MAX_SPAWN_TIME = 9500;
+const MIN_SPAWN_TIME = 2000;
+const MAX_SPAWN_TIME = 5500;
 
 const POWER_UPS = [
   Grow
