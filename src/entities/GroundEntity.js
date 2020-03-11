@@ -103,7 +103,7 @@ export default class GroundEntity {
       })
       .fillPoints(PATH);
 
-    for (var i = 0; i < 50; i += 2) {
+    for (var i = 0; i < 50; i += 3) {
       this.scene.add
         .graphics({
           x: this.scene.game.config.width / 2 - this.sprite.displayOriginX,
