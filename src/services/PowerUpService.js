@@ -25,14 +25,10 @@ export default class PowerUpService {
   }
 
   spawn() {
-    this.getNextPowerUp();
-  }
-
-  getNextPowerUp() {
     const {
       x, y
     } = this.scene.getRandomGroundPosition();
-    return new POWER_UPS[0](this.scene, x, y);
+    return new POWER_UPS[0](this.scene, x, y).init();
   }
 
   update(time) {
