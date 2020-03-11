@@ -3,7 +3,6 @@ import {
 } from '../../config/constants';
 
 export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
-  label = 'PowerUp';
   scene = null;
   timerEvent = null;
   lifeTime = 0;
@@ -35,7 +34,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   }
 
   setLabel() {
-    this.body.label = this.label;
+    this.body.label = 'PowerUp::' + this.constructor.name;
   }
 
   consume(playerBody) {

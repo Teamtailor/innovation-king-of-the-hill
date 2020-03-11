@@ -1,4 +1,3 @@
-
 import PowerUpBase from './PowerUpBase';
 
 const LIFETIME = 4000;
@@ -10,7 +9,6 @@ const GROW_MODIFIERS = {
 };
 
 export default class Grow extends PowerUpBase {
-  label = 'PowerUp::Grow';
   lifeTime = LIFETIME;
 
   constructor(scene, x, y) {
