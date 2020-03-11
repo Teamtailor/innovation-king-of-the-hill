@@ -1,5 +1,3 @@
-import GameScene from '../GameScene';
-
 class MainMenuScene extends Phaser.Scene {
   constructor() {
     super({
@@ -20,6 +18,7 @@ class MainMenuScene extends Phaser.Scene {
   preload() {}
 
   create() {
+    console.log(this.scene);
     const buttons = [];
     const backgroundColor = 0xffffff;
 
@@ -121,7 +120,6 @@ class MainMenuScene extends Phaser.Scene {
   }
  
   goToGame() {
-    this.scene.add('GameScene', GameScene);
     this.scene.start('GameScene');
   }
 

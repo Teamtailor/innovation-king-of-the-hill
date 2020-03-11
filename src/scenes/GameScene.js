@@ -71,8 +71,11 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
+    const escButton = this.input.keyboard.addKey('esc');
     this.adjustCamera();
     this.scale.on('resize', this.resize, this);
+
+    escButton.on('down', this.goToMenu.bind(this));
 
     this.stars = new StarBackgroundEntity({
       scene: this
@@ -92,7 +95,7 @@ class GameScene extends Phaser.Scene {
     this.add.text(
       10,
       10,
-      'Controls:\nPush: Arrows & Space\nTank: WASD & R\nMouse: Click & B',
+      'Controls:\nPush: Arrows & Space\nTank: WASD & R\nMouse: Click & B\nGo to menu: Esc',
       {
         fontFamily: 'Arial',
         fontSize: 12,
@@ -108,6 +111,10 @@ class GameScene extends Phaser.Scene {
   getPlayerFromBody(body) {
     const [player] = this.players.filter(p => p.matterObj.body === body);
     return player;
+  }
+
+  goToMenu() {
+    this.scene.start('MainMenuScene');
   }
 
   enteringGround({
