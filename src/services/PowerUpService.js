@@ -15,8 +15,11 @@ export default class PowerUpService {
     this.scene = scene;
   }
 
-  init() {
+  preload() {
     this.scene.load.svg('pizza', 'assets/svg/pizza.svg');
+  }
+
+  start() {
     this.setSpawnTime();
   }
 

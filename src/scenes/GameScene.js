@@ -14,7 +14,7 @@ class GameScene extends BaseScene {
   }
 
   preload() {
-    this.powerUpService.init();
+    this.powerUpService.preload();
   }
 
   create() {
@@ -38,6 +38,7 @@ class GameScene extends BaseScene {
 
     this.createPlayers();
     this.createInstructions();
+    this.powerUpService.start();
   }
 
   createInstructions() {
