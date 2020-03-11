@@ -67,10 +67,18 @@ class MainMenuScene extends BaseScene {
     menuHolderGraphics.fillRectShape(menuHolderRect);
     this.add.graphics(menuHolderGraphics);
 
-    buttons.push(this.add.sprite(400, 270, 'NewGameButton', 0).setInteractive());
-    buttons.push(this.add.sprite(400, 370, 'ResumeGameButton', 0).setInteractive());
-    buttons.push(this.add.sprite(400, 470, 'RulesButton', 0).setInteractive());
-    buttons.push(this.add.sprite(400, 570, 'ScoreboardButton', 0).setInteractive());
+    buttons.push(this.add.sprite(400, 270, 'NewGameButton', 0).setInteractive({
+      cursor: 'pointer'
+    }));
+    buttons.push(this.add.sprite(400, 370, 'ResumeGameButton', 0).setInteractive({
+      cursor: 'pointer'
+    }));
+    buttons.push(this.add.sprite(400, 470, 'RulesButton', 0).setInteractive({
+      cursor: 'pointer'
+    }));
+    buttons.push(this.add.sprite(400, 570, 'ScoreboardButton', 0).setInteractive({
+      cursor: 'pointer'
+    }));
 
     this.resizeElements(buttons, 280, 90);
 
