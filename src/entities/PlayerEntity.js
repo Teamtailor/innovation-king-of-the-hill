@@ -3,6 +3,8 @@ import {
 } from '../config/constants';
 
 export default class PlayerEntity {
+  powerUps = [];
+
   constructor(
     scene,
     {
@@ -242,6 +244,8 @@ export default class PlayerEntity {
     this.matterObj.destroy();
     this.border.destroy();
     this.maskShape.destroy();
+    this.powerUps.forEach((powerUp) => powerUp.destroy());
+    this.powerUps = [];
   }
 
   die() {
@@ -286,11 +290,36 @@ export default class PlayerEntity {
     this.readController(delta);
   }
 
-  grow() {
-    const body = this.matterObj.body;
-    this.matterObj.setDensity(body.density + 0.0001);
-    this.matterObj.setScale(this.matterObj.scale + 0.1);
-    this.maskShape.setScale(this.matterObj.scale + 0.1);
-    this.strength += 0.3;
+  addPowerUp(powerUp) {
+    this.powerUps.push(powerUp);
+  }
+
+  removePowerUp(powerUp) {
+    const index = this.powerUps.findIndex(pu => pu.id === powerUp.id);
+    if (index > -1) {
+      return;
+    }
+    this.powerUps.splice(index, 1);
+  }
+
+  grow(sizeModifiers) {
+    this.changeSize(sizeModifiers, 1);
+  }
+
+  shrink(sizeModifiers) {
+    this.changeSize(sizeModifiers, -1);
+  }
+
+  changeSize({
+    strengthModifier, scaleModifier, densityModifier
+  }, sign = 1) {
+    const {
+      body, scale
+    } = this.matterObj;
+
+    this.matterObj.setDensity(body.density + (densityModifier * sign));
+    this.matterObj.setScale(scale + (scaleModifier * sign));
+    this.maskShape.setScale(scale + (scaleModifier * sign));
+    this.strength += (strengthModifier * sign);
   }
 }

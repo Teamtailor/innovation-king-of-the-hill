@@ -5,9 +5,13 @@ import {
 export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   label = 'PowerUp';
   scene = null;
+  timerEvent = null;
+  lifeTime = 0;
+  id = null;
 
   constructor (scene, x, y, texture) {
     super(scene.matter.world, x, y, texture);
+    this.id = scene.time.now + '' + Phaser.Math.Between(1000000, 9999999);
     this.scene = scene;
     this.scene.add.existing(this);
   }
@@ -36,7 +40,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
 
   consume(playerBody) {
     this.setCollisionCategory(COLLISION_CATEGORIES.NONE);
-    this.applyToPlayer(this.scene.getPlayerFromBody(playerBody));
+    this.attachToPlayer(this.scene.getPlayerFromBody(playerBody));
     this.animateConsumation(() => {
       console.log('Animation complete', this);
       this.destroy();
@@ -69,7 +73,22 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
     this.consume(bodyA);
   }
 
-  applyToPlayer() {
-    console.warn('Class ' + this.constructor.name + ' needs to override this mofo: PowerUpBase::applyToPlayer');
+  attachToPlayer(player) {
+    player.addPowerUp(this);
+
+    this.timerEvent = this.scene.time.addEvent({
+      delay: this.lifeTime,
+      callback: this.onTimerEventComplete,
+      callbackScope: this,
+      args: [player]
+    });
+  }
+
+  detachFromPlayer(player) {
+    player.removePowerUp(this);
+  }
+
+  onTimerEventComplete(player) {
+    this.detachFromPlayer(player);
   }
 }
