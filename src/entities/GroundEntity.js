@@ -49,6 +49,9 @@ const PATH = [
 const GROUND_POSITION_MARGIN = 30;
 
 export default class GroundEntity {
+  sprite = null;
+  scene = null;
+
   constructor({
     scene,
     onCollideCallback,

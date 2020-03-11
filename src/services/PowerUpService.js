@@ -8,10 +8,11 @@ const POWER_UPS = [
 ];
 
 export default class PowerUpService {
+  nextSpawnTime = 0;
+  lastSpawn = 0;
+
   constructor(scene) {
     this.scene = scene;
-    this.nextSpawnTime = 0;
-    this.lastSpawn = 0;
   }
 
   init() {
