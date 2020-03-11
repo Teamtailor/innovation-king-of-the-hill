@@ -92,6 +92,9 @@ class GameScene extends Phaser.Scene {
     bodyA, bodyB
   }) {
     const player = this.getPlayerFromBody(bodyB);
+    if (!player) {
+      return;
+    }
     player.removeFromGround(bodyA);
 
     await player.finishBoosting();
