@@ -1,28 +1,33 @@
 import PlayerEntity from '../entities/PlayerEntity';
 import GroundEntity from '../entities/GroundEntity';
+import PowerUpService from '../services/PowerUpService';
 
 class GameScene extends Phaser.Scene {
   constructor() {
     super({
       key: 'GameScene'
     });
+
+    this.powerUpService = new PowerUpService(this);
   }
 
-  preload() {}
+  preload() {
+    this.powerUpService.init();
+  }
 
   create() {
-    const ground = new GroundEntity();
+    this.ground = new GroundEntity();
     const poly = this.add.polygon(
       this.game.config.width / 2,
       this.game.config.height / 2,
-      ground.getPath(),
+      this.ground.path,
       0xff0000
     );
 
-    this.matter.add.gameObject(poly, {
+    this.groundSprite = this.matter.add.gameObject(poly, {
       shape: {
         type: 'fromVerts',
-        verts: ground.getPath()
+        verts: this.ground.path
       },
       isStatic: true,
       isSensor: true,
@@ -48,6 +53,25 @@ class GameScene extends Phaser.Scene {
     );
   }
 
+  pointIsOnGround(x, y) {
+    return Phaser.Geom.Polygon.Contains(this.ground.polygon, x, y);
+  }
+
+  getRandomGroundPosition() {
+    const {
+      x, y, width, height
+    } = this.groundSprite.getBounds();
+
+    const rect = new Phaser.Geom.Rectangle(x + 20, y + 20, width - 40, height - 40);
+    let point = rect.getRandomPoint();
+
+    while (!this.pointIsOnGround(point.x, point.y)) {
+      point = rect.getRandomPoint();
+    }
+
+    return point;
+  }
+
   getPlayerFromBody(body) {
     const [player] = this.players.filter(p => p.matterObj.body === body);
     return player;
@@ -56,8 +80,12 @@ class GameScene extends Phaser.Scene {
   enteringGround({
     bodyA, bodyB
   }) {
+    console.log(bodyA, bodyB);
     const player = this.getPlayerFromBody(bodyB);
-    player.addToGround(bodyA);
+
+    if (player) {
+      player.addToGround(bodyA);
+    }
   }
 
   async leavingGround({
@@ -146,6 +174,8 @@ class GameScene extends Phaser.Scene {
     this.players.forEach(p => {
       p.update(time, delta);
     });
+
+    this.powerUpService.update(time, delta);
   }
 }
 
