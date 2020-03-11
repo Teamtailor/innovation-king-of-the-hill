@@ -27,6 +27,7 @@ export default class StarBackgroundEntity {
       star.sprite.setOrigin(0.5, 0.7);
       this.randomizeStar(star, true);
       this.stars.push(star);
+      console.log(star.sprite);
     }
 
     setInterval(() => {
@@ -44,6 +45,8 @@ export default class StarBackgroundEntity {
     const distance = Math.random() * 50 + 1;
     star.x = Math.cos(deg) * distance;
     star.y = Math.sin(deg) * distance;
+
+    star.sprite.rotation = (Math.random() * 360 * 180) / Math.PI;
   }
 
   updateSprite(star) {
@@ -59,10 +62,10 @@ export default class StarBackgroundEntity {
       star.y * (fov / z) * this.scene.game.config.width +
       this.scene.game.config.height / 2;
 
-    const dxCenter = star.sprite.x - this.scene.game.config.width / 2;
-    const dyCenter = star.sprite.y - this.scene.game.config.height / 2;
+    // const dxCenter = star.sprite.x - this.scene.game.config.width / 2;
+    // const dyCenter = star.sprite.y - this.scene.game.config.height / 2;
 
-    const distanceCenter = Math.sqrt(dxCenter * dxCenter + dyCenter * dyCenter);
+    // const distanceCenter = Math.sqrt(dxCenter * dxCenter + dyCenter * dyCenter);
     const distanceScale = Math.max(0, (2000 - z) / 2000);
 
     star.sprite.setScale(
@@ -74,7 +77,9 @@ export default class StarBackgroundEntity {
           this.scene.game.config.width */
     );
 
-    star.sprite.rotation = Math.atan2(dyCenter, dxCenter) + Math.PI / 2;
+    star.sprite.rotation += 0.02;
+
+    // star.sprite.rotation = Math.atan2(dyCenter, dxCenter) + Math.PI / 2;
   }
 
   update(delta) {
