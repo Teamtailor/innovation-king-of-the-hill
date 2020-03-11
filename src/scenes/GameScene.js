@@ -16,26 +16,11 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.ground = new GroundEntity();
-    const poly = this.add.polygon(
-      this.game.config.width / 2,
-      this.game.config.height / 2,
-      this.ground.path,
-      0xff0000
-    );
-
-    this.groundSprite = this.matter.add.gameObject(poly, {
-      shape: {
-        type: 'fromVerts',
-        verts: this.ground.path
-      },
-      isStatic: true,
-      isSensor: true,
-      label: 'ground',
+    this.ground = new GroundEntity({
+      scene: this,
       onCollideCallback: this.enteringGround.bind(this),
       onCollideEndCallback: this.leavingGround.bind(this)
     });
-
     this.createPlayers();
     this.createInstructions();
   }
@@ -53,23 +38,8 @@ class GameScene extends Phaser.Scene {
     );
   }
 
-  pointIsOnGround(x, y) {
-    return Phaser.Geom.Polygon.Contains(this.ground.polygon, x, y);
-  }
-
   getRandomGroundPosition() {
-    const {
-      x, y, width, height
-    } = this.groundSprite.getBounds();
-
-    const rect = new Phaser.Geom.Rectangle(x + 20, y + 20, width - 40, height - 40);
-    let point = rect.getRandomPoint();
-
-    while (!this.pointIsOnGround(point.x, point.y)) {
-      point = rect.getRandomPoint();
-    }
-
-    return point;
+    return this.ground.getRandomPosition();
   }
 
   getPlayerFromBody(body) {

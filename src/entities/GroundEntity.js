@@ -46,9 +46,35 @@ const PATH = [
   }
 ];
 
+const GROUND_POSITION_MARGIN = 30;
+
 export default class GroundEntity {
-  constructor() {
+  constructor({
+    scene,
+    onCollideCallback,
+    onCollideEndCallback
+  }) {
+    this.scene = scene;
     this._polygon = new Phaser.Geom.Polygon(PATH);
+
+    const poly = this.scene.add.polygon(
+      this.scene.game.config.width / 2,
+      this.scene.game.config.height / 2,
+      this.path,
+      0xff0000
+    );
+
+    this.sprite = this.scene.matter.add.gameObject(poly, {
+      shape: {
+        type: 'fromVerts',
+        verts: this.path
+      },
+      isStatic: true,
+      isSensor: true,
+      label: 'ground',
+      onCollideCallback: onCollideCallback,
+      onCollideEndCallback: onCollideEndCallback
+    });
   }
 
   get polygon() {
@@ -57,5 +83,24 @@ export default class GroundEntity {
 
   get path() {
     return this.polygon.points;
+  }
+
+  pointIsOnGround(x, y) {
+    return Phaser.Geom.Polygon.Contains(this.polygon, x, y);
+  }
+
+  getRandomPosition() {
+    const {
+      x, y, width, height
+    } = this.sprite.getBounds();
+
+    const rect = new Phaser.Geom.Rectangle(x + GROUND_POSITION_MARGIN, y + GROUND_POSITION_MARGIN, width - GROUND_POSITION_MARGIN * 2, height - GROUND_POSITION_MARGIN * 2);
+    let point = rect.getRandomPoint();
+
+    while (!this.pointIsOnGround(point.x, point.y)) {
+      point = rect.getRandomPoint();
+    }
+
+    return point;
   }
 }
