@@ -5,7 +5,7 @@ const baseSpeed = 0.025;
 let speed = 0;
 let warpSpeed = 0;
 const starStretch = 5;
-const starBaseSize = 0.05;
+const starBaseSize = 0.1;
 
 export default class StarBackgroundEntity {
   sprite = null;
@@ -19,7 +19,7 @@ export default class StarBackgroundEntity {
     this.stars = [];
     for (let i = 0; i < starAmount; i++) {
       const star = {
-        sprite: this.scene.add.sprite(100, 100, 'star'),
+        sprite: this.scene.add.sprite(100, 100, 'pizza'),
         z: 0,
         x: 0,
         y: 0
@@ -67,9 +67,11 @@ export default class StarBackgroundEntity {
 
     star.sprite.setScale(
       distanceScale * starBaseSize,
-      distanceScale * starBaseSize +
+      distanceScale * starBaseSize
+
+      /* +
         (distanceScale * speed * starStretch * distanceCenter) /
-          this.scene.game.config.width
+          this.scene.game.config.width */
     );
 
     star.sprite.rotation = Math.atan2(dyCenter, dxCenter) + Math.PI / 2;
