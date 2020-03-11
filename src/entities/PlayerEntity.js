@@ -316,10 +316,12 @@ export default class PlayerEntity {
     const {
       body, scale
     } = this.matterObj;
+    const newScale = scale + (scaleModifier * sign);
 
     this.matterObj.setDensity(body.density + (densityModifier * sign));
-    this.matterObj.setScale(scale + (scaleModifier * sign));
-    this.maskShape.setScale(scale + (scaleModifier * sign));
+    this.maskShape.setScale(newScale);
+    this.matterObj.setScale(newScale);
+    this.border.setScale(newScale);
     this.strength += (strengthModifier * sign);
   }
 }
