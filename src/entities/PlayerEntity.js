@@ -1,3 +1,7 @@
+import {
+  COLLISION_CATEGORIES
+} from '../config/constants';
+
 export default class PlayerEntity {
   constructor(
     scene,
@@ -43,6 +47,9 @@ export default class PlayerEntity {
         density: 0.005
       }
     );
+    this.matterObj.setCollisionCategory(COLLISION_CATEGORIES.PLAYER);
+    this.matterObj.setCollidesWith(COLLISION_CATEGORIES.POWER_UP | COLLISION_CATEGORIES.PLAYER | COLLISION_CATEGORIES.GROUND);
+
     this.matterObj.setMask(this.maskShape.createGeometryMask());
 
     this.strength = 1;
@@ -277,5 +284,13 @@ export default class PlayerEntity {
     this.updateAvailableStrength(delta);
     this.updateMask();
     this.readController(delta);
+  }
+
+  grow() {
+    const body = this.matterObj.body;
+    this.matterObj.setDensity(body.density + 0.0001);
+    this.matterObj.setScale(this.matterObj.scale + 0.1);
+    this.maskShape.setScale(this.matterObj.scale + 0.1);
+    this.strength += 0.3;
   }
 }

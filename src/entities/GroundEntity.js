@@ -1,3 +1,7 @@
+import {
+  COLLISION_CATEGORIES
+} from '../config/constants';
+
 const PATH = [
   {
     x: 50,
@@ -115,6 +119,8 @@ export default class GroundEntity {
       .tileSprite(-1000, -1000, 3000, 3000, 'grass')
       .setOrigin(0)
       .setMask(mask.createGeometryMask());
+
+    this.sprite.setCollisionCategory(COLLISION_CATEGORIES.GROUND);
   }
 
   get polygon() {
