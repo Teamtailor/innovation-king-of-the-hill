@@ -1,4 +1,5 @@
 import BaseScene from '../BaseScene';
+import constants from '../../config/constants';
 
 class MainMenuScene extends BaseScene {
   constructor() {
@@ -17,28 +18,48 @@ class MainMenuScene extends BaseScene {
     ];
   }
 
+  resize(gameSize, baseSize, displaySize, resolution) {
+    this.adjustCamera();
+  }
+
+  adjustCamera() {
+    const {
+      main
+    } = this.cameras;
+
+    const {
+      gameSize
+    } = main.scaleManager;
+
+    const zoomX = gameSize.width / constants.WIDTH;
+    const zoomY = gameSize.height / constants.HEIGHT;
+    const zoom = zoomX > zoomY ? zoomY : zoomX;
+
+    if (!this.follow) {
+      main.setZoom(zoom);
+      main.centerOn(constants.WIDTH / 2, constants.HEIGHT / 2);
+    } else {
+      main.setZoom(zoom * 2);
+    }
+  }
+
   preload() {}
 
   create() {
     super.create();
+    this.adjustCamera();
+    this.scale.on('resize', this.resize, this);
 
     const buttons = [];
-    const backgroundColor = 0xffffff;
 
-    this.cameras.main.setBackgroundColor(backgroundColor);
+    this.add.image(-110, -50, 'MenuBackground').setOrigin(0).setScale(1.7);
 
     this.drawActiveUsers();
 
-    this.add.text(300, 100, 'Welcome to Teamtailor\'s King of the Hill', {
-      fontFamily: 'Arial',
-      fontSize: 45,
-      color: '#000000'
-    });
-
-    buttons.push(this.add.image(440, 270, 'NewGameButton').setInteractive());
-    buttons.push(this.add.image(440, 370, 'ResumeGameButton').setInteractive());
-    buttons.push(this.add.image(440, 470, 'RulesButton').setInteractive());
-    buttons.push(this.add.image(440, 570, 'ScoreboardButton').setInteractive());
+    buttons.push(this.add.image(400, 270, 'NewGameButton').setInteractive());
+    buttons.push(this.add.image(400, 370, 'ResumeGameButton').setInteractive());
+    buttons.push(this.add.image(400, 470, 'RulesButton').setInteractive());
+    buttons.push(this.add.image(400, 570, 'ScoreboardButton').setInteractive());
 
     this.resizeElements(buttons, 280, 90);
 
@@ -53,8 +74,8 @@ class MainMenuScene extends BaseScene {
   }
 
   drawActiveUsers() {
-    const borderRect = new Phaser.Geom.Rectangle(710, 200, 350, 430);
-    const activeUsersRect = new Phaser.Geom.Rectangle(712, 202, 346, 426);
+    const borderRect = new Phaser.Geom.Rectangle(680, 200, 350, 430);
+    const activeUsersRect = new Phaser.Geom.Rectangle(682, 202, 346, 426);
     const line = new Phaser.Geom.Line(780, 300, 960, 300);
 
     const borderGraphics = this.add.graphics({
@@ -74,7 +95,7 @@ class MainMenuScene extends BaseScene {
     activeUsersGraphics.lineStyle(2, 0x000000);
     activeUsersGraphics.strokeLineShape(line);
 
-    this.add.text(770, 250, 'Players online now', {
+    this.add.text(750, 250, 'Players online now', {
       fontFamily: 'Arial',
       fontSize: 25,
       color: '#000000'
@@ -89,10 +110,10 @@ class MainMenuScene extends BaseScene {
   drawUsersList(maxPlayersCount) {
     let printedUsersCount = 0;
     let printStartPositionY = 400;
-    const printStartPositionX = 780;
+    const printStartPositionX = 740;
     const tableSpace = 70;
-
-    this.add.text(750, 350, 'Levels', {
+    
+    this.add.text(730, 350, 'Levels', {
       fontFamily: 'Arial',
       fontSize: 25,
       color: '#000000'
