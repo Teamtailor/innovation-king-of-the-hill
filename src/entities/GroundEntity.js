@@ -1,48 +1,63 @@
 const PATH = [
   {
-    x: 50, y: 50
+    x: 50,
+    y: 50
   },
   {
-    x: 150, y: 0
+    x: 150,
+    y: 0
   },
   {
-    x: 430, y: 55
+    x: 430,
+    y: 55
   },
   {
-    x: 900, y: 15
+    x: 900,
+    y: 15
   },
   {
-    x: 1020, y: 45
+    x: 1020,
+    y: 45
   },
   {
-    x: 1060, y: 175
+    x: 1060,
+    y: 175
   },
   {
-    x: 1000, y: 275
+    x: 1000,
+    y: 275
   },
   {
-    x: 1080, y: 325
+    x: 1080,
+    y: 325
   },
   {
-    x: 990, y: 450
+    x: 990,
+    y: 450
   },
   {
-    x: 800, y: 620
+    x: 800,
+    y: 620
   },
   {
-    x: 600, y: 500
+    x: 600,
+    y: 500
   },
   {
-    x: 550, y: 440
+    x: 550,
+    y: 440
   },
   {
-    x: 520, y: 380
+    x: 520,
+    y: 380
   },
   {
-    x: 150, y: 445
+    x: 150,
+    y: 445
   },
   {
-    x: 40, y: 250
+    x: 40,
+    y: 250
   }
 ];
 
@@ -53,9 +68,7 @@ export default class GroundEntity {
   scene = null;
 
   constructor({
-    scene,
-    onCollideCallback,
-    onCollideEndCallback
+    scene, onCollideCallback, onCollideEndCallback
   }) {
     this.scene = scene;
     this._polygon = new Phaser.Geom.Polygon(PATH);
@@ -66,6 +79,16 @@ export default class GroundEntity {
       this.path,
       0xff0000
     );
+
+    // const maskShape = poly.createGeometryMask();
+
+    // console.log(poly, this._polygon);
+
+    /* const bg = this.scene.add
+      .tileSprite(-1000, -1000, 3000, 3000, 'grass')
+      .setOrigin(0);
+*/
+    // console.log(bg);
 
     this.sprite = this.scene.matter.add.gameObject(poly, {
       shape: {
@@ -78,6 +101,23 @@ export default class GroundEntity {
       onCollideCallback: onCollideCallback,
       onCollideEndCallback: onCollideEndCallback
     });
+
+    const graphics = this.scene.add.graphics().fillPoints(PATH);
+    graphics.x = this.scene.game.config.width / 2 - this.sprite.displayOriginX;
+    graphics.y = this.scene.game.config.height / 2 - this.sprite.displayOriginY;
+
+    const bg = this.scene.add
+      .tileSprite(-1000, -1000, 3000, 3000, 'grass')
+      .setOrigin(0)
+      .setMask(this.sprite.createGeometryMask(graphics));
+
+    console.log(
+      this.sprite,
+      graphics,
+      this.sprite.createGeometryMask(graphics),
+      this.sprite.originY * this.sprite.height,
+      this.sprite.displayOriginY
+    );
   }
 
   get polygon() {
@@ -97,7 +137,12 @@ export default class GroundEntity {
       x, y, width, height
     } = this.sprite.getBounds();
 
-    const rect = new Phaser.Geom.Rectangle(x + GROUND_POSITION_MARGIN, y + GROUND_POSITION_MARGIN, width - GROUND_POSITION_MARGIN * 2, height - GROUND_POSITION_MARGIN * 2);
+    const rect = new Phaser.Geom.Rectangle(
+      x + GROUND_POSITION_MARGIN,
+      y + GROUND_POSITION_MARGIN,
+      width - GROUND_POSITION_MARGIN * 2,
+      height - GROUND_POSITION_MARGIN * 2
+    );
     let point = rect.getRandomPoint();
 
     while (!this.pointIsOnGround(point.x, point.y)) {

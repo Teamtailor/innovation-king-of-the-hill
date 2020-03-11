@@ -48,6 +48,8 @@ class BootScene extends Phaser.Scene {
       'ramya',
       '//res.cloudinary.com/teamtailor/c_thumb,f_auto,h_48,q_auto,w_48/v1568805770/ojwnlxauurjdhp3bpby3'
     );
+
+    this.load.image('grass', 'assets/images/grass.jpg');
   }
 
   create() {
