@@ -4,6 +4,7 @@ import {
 
 export default class PlayerEntity {
   powerUps = [];
+  speedModifier = 1;
 
   constructor(
     scene,
@@ -67,7 +68,7 @@ export default class PlayerEntity {
   }
 
   updateAvailableStrength(delta) {
-    this.availableStrength = this.strength * 1 - this.fatigue;
+    this.availableStrength = this.strength - this.fatigue;
   }
 
   readMouse(delta, boost) {
@@ -87,8 +88,8 @@ export default class PlayerEntity {
           .normalize()
           .multiply(
             new Phaser.Math.Vector2(
-              0.05 * this.availableStrength,
-              0.05 * this.availableStrength
+              this.applySpeedModifiers(0.05),
+              this.applySpeedModifiers(0.05)
             )
           );
 
@@ -113,16 +114,16 @@ export default class PlayerEntity {
     let thrust = 0;
 
     if (up.isDown) {
-      thrust += 0.05 * this.availableStrength;
+      thrust += this.applySpeedModifiers(0.05);
     }
     if (down.isDown) {
-      thrust += -0.05 * this.availableStrength;
+      thrust += this.applySpeedModifiers(-0.05);
     }
     if (left.isDown && !this.boosting) {
-      this.matterObj.setAngularVelocity(-0.1 * this.availableStrength);
+      this.matterObj.setAngularVelocity(this.applySpeedModifiers(-0.1));
     }
     if (right.isDown && !this.boosting) {
-      this.matterObj.setAngularVelocity(0.1 * this.availableStrength);
+      this.matterObj.setAngularVelocity(this.applySpeedModifiers(0.1));
     }
 
     if (boost) {
@@ -145,16 +146,16 @@ export default class PlayerEntity {
     const force = new Phaser.Math.Vector2(0, 0);
 
     if (up.isDown) {
-      force.add(new Phaser.Math.Vector2(0.0, -0.05 * this.availableStrength));
+      force.add(new Phaser.Math.Vector2(0.0, this.applySpeedModifiers(-0.05)));
     }
     if (down.isDown) {
-      force.add(new Phaser.Math.Vector2(0.0, 0.05 * this.availableStrength));
+      force.add(new Phaser.Math.Vector2(0.0, this.applySpeedModifiers(0.05)));
     }
     if (left.isDown) {
-      force.add(new Phaser.Math.Vector2(-0.05 * this.availableStrength, 0));
+      force.add(new Phaser.Math.Vector2(this.applySpeedModifiers(-0.05), 0));
     }
     if (right.isDown) {
-      force.add(new Phaser.Math.Vector2(0.05 * this.availableStrength, 0));
+      force.add(new Phaser.Math.Vector2(this.applySpeedModifiers(0.05), 0));
     }
 
     this.matterObj.applyForce(force);
@@ -218,6 +219,10 @@ export default class PlayerEntity {
     } else {
       this.readPushControls(delta, boost);
     }
+  }
+
+  applySpeedModifiers(value) {
+    return value * this.availableStrength * this.speedModifier;
   }
 
   finishBoosting() {
@@ -323,5 +328,13 @@ export default class PlayerEntity {
     this.matterObj.setScale(newScale);
     this.border.setScale(newScale);
     this.strength += (strengthModifier * sign);
+  }
+
+  speedUp(value) {
+    this.speedModifier += value;
+  }
+
+  slowDown(value) {
+    this.speedModifier -= value;
   }
 }

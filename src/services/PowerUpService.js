@@ -1,10 +1,12 @@
 import Grow from '../entities/power-ups/Grow';
+import SpeedUp from '../entities/power-ups/SpeedUp';
 
 const MIN_SPAWN_TIME = 2000;
 const MAX_SPAWN_TIME = 5500;
 
 const POWER_UPS = [
-  Grow
+  Grow,
+  SpeedUp
 ];
 
 export default class PowerUpService {
@@ -17,6 +19,7 @@ export default class PowerUpService {
 
   preload() {
     this.scene.load.svg('pizza', 'assets/svg/pizza.svg');
+    this.scene.load.svg('soda-can', 'assets/svg/soda-can.svg');
   }
 
   start() {
@@ -31,7 +34,8 @@ export default class PowerUpService {
     const {
       x, y
     } = this.scene.getRandomGroundPosition();
-    return new POWER_UPS[0](this.scene, x, y).init();
+    const index = Phaser.Math.Between(0, POWER_UPS.length - 1);
+    return new POWER_UPS[index](this.scene, x, y).init();
   }
 
   update(time) {

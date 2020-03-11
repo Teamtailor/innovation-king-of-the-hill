@@ -16,12 +16,11 @@ export default class Grow extends PowerUpBase {
     this.setScale(0.2);
   }
 
-  attachToPlayer(player) {
-    super.attachToPlayer(player);
+  onAttachToPlayer(player) {
     player.grow(GROW_MODIFIERS);
   }
 
-  detachFromPlayer(player) {
+  onDetachFromPlayer(player) {
     player.shrink(GROW_MODIFIERS);
   }
 }

@@ -81,10 +81,13 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
       callbackScope: this,
       args: [player]
     });
+
+    this.onAttachToPlayer(player);
   }
 
   detachFromPlayer(player) {
     player.removePowerUp(this);
+    this.onDetachFromPlayer(player);
   }
 
   onTimerEventComplete(player) {
