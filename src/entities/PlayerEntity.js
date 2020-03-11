@@ -39,7 +39,7 @@ export default class PlayerEntity {
           radius: 24
         },
         frictionAir: 0.2,
-        restitution: 1,
+        restitution: 4,
         density: 0.005
       }
     );
