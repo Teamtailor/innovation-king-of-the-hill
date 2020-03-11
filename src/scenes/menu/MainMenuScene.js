@@ -1,4 +1,6 @@
-class MainMenuScene extends Phaser.Scene {
+import BaseScene from '../BaseScene';
+
+class MainMenuScene extends BaseScene {
   constructor() {
     super({
       key: 'MainMenuScene'
@@ -18,7 +20,8 @@ class MainMenuScene extends Phaser.Scene {
   preload() {}
 
   create() {
-    console.log(this.scene);
+    super.create();
+
     const buttons = [];
     const backgroundColor = 0xffffff;
 
@@ -38,7 +41,7 @@ class MainMenuScene extends Phaser.Scene {
     buttons.push(this.add.image(440, 570, 'ScoreboardButton').setInteractive());
 
     this.resizeElements(buttons, 280, 90);
-    
+
     buttons[0].on('pointerdown', this.goToGame.bind(this));
     buttons[1].on('pointerdown', this.goToGame.bind(this));
     buttons[2].on('pointerdown', this.goToRules.bind(this));
@@ -76,7 +79,7 @@ class MainMenuScene extends Phaser.Scene {
       fontSize: 25,
       color: '#000000'
     });
-  
+
     this.add.graphics(borderGraphics);
     this.add.graphics(activeUsersGraphics);
 
@@ -88,7 +91,7 @@ class MainMenuScene extends Phaser.Scene {
     let printStartPositionY = 400;
     const printStartPositionX = 780;
     const tableSpace = 70;
-    
+
     this.add.text(750, 350, 'Levels', {
       fontFamily: 'Arial',
       fontSize: 25,
@@ -107,18 +110,23 @@ class MainMenuScene extends Phaser.Scene {
           fontSize: 25,
           color: '#000000'
         });
-        this.add.text((printStartPositionX + tableSpace), printStartPositionY, player.name, {
-          fontFamily: 'Arial',
-          fontSize: 25,
-          color: '#000000'
-        });
+        this.add.text(
+          printStartPositionX + tableSpace,
+          printStartPositionY,
+          player.name,
+          {
+            fontFamily: 'Arial',
+            fontSize: 25,
+            color: '#000000'
+          }
+        );
         printedUsersCount++;
         printStartPositionY += 40;
       }
     });
     console.log(this.players);
   }
- 
+
   goToGame() {
     this.scene.start('GameScene');
   }

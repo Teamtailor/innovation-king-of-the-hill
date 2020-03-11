@@ -1,10 +1,10 @@
+import BaseScene from './BaseScene';
 import PlayerEntity from '../entities/PlayerEntity';
 import GroundEntity from '../entities/GroundEntity';
 import StarBackgroundEntity from '../entities/StarBackgroundEntity';
 import PowerUpService from '../services/PowerUpService';
-import constants from '../config/constants';
 
-class GameScene extends Phaser.Scene {
+class GameScene extends BaseScene {
   constructor() {
     super({
       key: 'GameScene'
@@ -17,60 +17,9 @@ class GameScene extends Phaser.Scene {
     this.powerUpService.init();
   }
 
-  resize(gameSize, baseSize, displaySize, resolution) {
-    this.adjustCamera();
-  }
-
-  adjustCamera() {
-    const {
-      main
-    } = this.cameras;
-
-    const {
-      gameSize
-    } = main.scaleManager;
-
-    const zoomX = gameSize.width / constants.WIDTH;
-    const zoomY = gameSize.height / constants.HEIGHT;
-    const zoom = zoomX > zoomY ? zoomY : zoomX;
-
-    if (!this.follow) {
-      main.setZoom(zoom);
-      main.centerOn(constants.WIDTH / 2, constants.HEIGHT / 2);
-    } else {
-      main.setZoom(zoom * 2);
-    }
-  }
-
-  followObject(object) {
-    if (this.follow === object) {
-      return;
-    }
-
-    this.stopFollow(this.follow, true);
-
-    this.follow = object;
-    this.cameras.main.startFollow(object);
-
-    this.adjustCamera();
-  }
-
-  stopFollow(object, skipAdjust) {
-    if (object !== this.follow) {
-      return;
-    }
-
-    if (object === this.follow) {
-      this.cameras.main.stopFollow();
-      this.follow = undefined;
-    }
-
-    if (!skipAdjust) {
-      this.adjustCamera();
-    }
-  }
-
   create() {
+    super.create();
+
     const escButton = this.input.keyboard.addKey('esc');
     this.adjustCamera();
     this.scale.on('resize', this.resize, this);
