@@ -6,13 +6,16 @@ import BootScene from './scenes/BootScene';
 window.Phaser = Phaser;
 
 const config = {
-  // For more settings see <https://github.com/photonstorm/phaser/blob/master/src/boot/Config.js>
   type: Phaser.WEBGL,
   pixelArt: false,
-  roundPixels: false,
+  roundPixels: true,
   parent: 'content',
   width: constants.WIDTH,
   height: constants.HEIGHT,
+  scale: {
+    mode: Phaser.Scale.RESIZE,
+    autoCenter: Phaser.Scale.CENTER_BOTH
+  },
   physics: {
     default: 'matter',
     matter: {

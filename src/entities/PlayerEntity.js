@@ -2,7 +2,12 @@ export default class PlayerEntity {
   constructor(
     scene,
     {
-      image = 'avatar1', color = 0xf43f85, controls, useMouse, useTankControls
+      image = 'avatar1',
+      color = 0xf43f85,
+      controls,
+      useMouse,
+      useTankControls,
+      follow
     }
   ) {
     this.scene = scene;
@@ -38,7 +43,6 @@ export default class PlayerEntity {
         density: 0.005
       }
     );
-
     this.matterObj.setMask(this.maskShape.createGeometryMask());
 
     this.strength = 1;
@@ -47,20 +51,23 @@ export default class PlayerEntity {
     this.chargingBoost = false;
 
     this.keys = scene.input.keyboard.addKeys(controls);
+
+    if (follow) {
+      scene.followObject(this.matterObj);
+    }
   }
 
   updateAvailableStrength(delta) {
-    this.availableStrength =
-      (this.strength * 1 - this.fatigue) * (delta / (1000 / 60));
+    this.availableStrength = this.strength * 1 - this.fatigue;
   }
 
   readMouse(delta, boost) {
     const {
-      position, buttons
+      buttons, worldX, worldY
     } = this.scene.input.activePointer;
 
     if (buttons === 1) {
-      const relPos = new Phaser.Math.Vector2(position).subtract(
+      const relPos = new Phaser.Math.Vector2(worldX, worldY).subtract(
         new Phaser.Math.Vector2(this.matterObj.x, this.matterObj.y)
       );
 
@@ -185,7 +192,7 @@ export default class PlayerEntity {
 
   readController(delta) {
     if (this.fatigue > 0) {
-      this.fatigue -= ((delta / (1000 / 60)) * 0.5) / 60;
+      this.fatigue -= 0.5 / 60;
       if (this.fatigue < 0) this.fatigue = 0;
     }
 
@@ -243,6 +250,7 @@ export default class PlayerEntity {
         yoyo: false,
         repeat: 0,
         onComplete: () => {
+          this.scene.stopFollow(this.matterObj);
           resolve();
         }
       });
