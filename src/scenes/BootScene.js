@@ -51,6 +51,12 @@ class BootScene extends Phaser.Scene {
 
     this.load.image('grass', 'assets/images/grass.jpg');
     this.load.image('star', 'assets/images/star.png');
+
+    // Menu buttons preload
+    this.load.image('NewGameButton', '../assets/images/buttons/menu/ng.png');
+    this.load.image('ResumeGameButton', '../assets/images/buttons/menu/rg.png');
+    this.load.image('RulesButton', '../assets/images/buttons/menu/rs.png');
+    this.load.image('ScoreboardButton', '../assets/images/buttons/menu/sb.png');
   }
 
   create() {
