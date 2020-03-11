@@ -76,7 +76,7 @@ export default class GroundEntity {
     let point = rect.getRandomPoint();
 
     // give this 20 tries to not lock the process
-    for (var i = 0; !this.pointIsOnGround(point.x, point.y) || i < 20; i++) {
+    for (var i = 0; !this.pointIsOnGround(point.x, point.y) && i < 20; i++) {
       point = rect.getRandomPoint();
     }
 
