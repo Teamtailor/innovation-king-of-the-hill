@@ -136,26 +136,6 @@ class GameScene extends BaseScene {
         useMouse: true
       })
     );
-
-    this.players.push(
-      new PlayerEntity(this, {
-        image: 'ramya',
-        color: 0xffffff * Math.random()
-      })
-    );
-
-    this.players.push(
-      new PlayerEntity(this, {
-        color: 0xffffff * Math.random()
-      })
-    );
-
-    this.players.push(
-      new PlayerEntity(this, {
-        image: 'avatar2',
-        color: 0xffffff * Math.random()
-      })
-    );
   }
 
   update(time, delta) {

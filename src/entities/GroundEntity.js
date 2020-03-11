@@ -75,50 +75,45 @@ export default class GroundEntity {
     scene, onCollideCallback, onCollideEndCallback
   }) {
     this.scene = scene;
-    this._polygon = new Phaser.Geom.Polygon(PATH);
 
-    const poly = this.scene.add.polygon(
-      this.scene.game.config.width / 2,
-      this.scene.game.config.height / 2,
-      this.path,
-      0xff0000
+    var shapes = this.scene.cache.json.get('shapes');
+
+    var [{
+      vertices
+    }] = shapes.level.fixtures;
+
+    this._polygon = new Phaser.Geom.Polygon(vertices.flat()); // not working :shrug:
+
+    this.sprite = this.scene.matter.add.sprite(
+      scene.game.config.width / 2,
+      scene.game.config.height / 2,
+      'level',
+      null,
+      {
+        shape: shapes.level
+      }
     );
 
-    this.sprite = this.scene.matter.add.gameObject(poly, {
-      shape: {
-        type: 'fromVerts',
-        verts: this.path
-      },
-      isStatic: true,
-      isSensor: true,
-      label: 'ground',
-      onCollideCallback: onCollideCallback,
-      onCollideEndCallback: onCollideEndCallback
+    // this needed to be done because of bug when importing shape from PhysicsEditor
+    this.scene.matter.world.on('collisionstart', function(event) {
+      for (var i = 0; i < event.pairs.length; i++) {
+        const pair = event.pairs[i];
+
+        if (pair.bodyA.label === 'ground') {
+          onCollideCallback(pair);
+        }
+      }
     });
 
-    const mask = this.scene.make
-      .graphics({
-        x: this.scene.game.config.width / 2 - this.sprite.displayOriginX,
-        y: this.scene.game.config.height / 2 - this.sprite.displayOriginY
-      })
-      .fillPoints(PATH);
+    this.scene.matter.world.on('collisionend', function(event) {
+      for (var i = 0; i < event.pairs.length; i++) {
+        const pair = event.pairs[i];
 
-    for (var i = 0; i < 50; i += 3) {
-      this.scene.add
-        .graphics({
-          x: this.scene.game.config.width / 2 - this.sprite.displayOriginX,
-          y: this.scene.game.config.height / 2 - this.sprite.displayOriginY + i,
-          fillStyle: {
-            color: 0x8c3b0c
-          }
-        })
-        .fillPoints(PATH);
-    }
-
-    this.scene.add
-      .tileSprite(-1000, -1000, 3000, 3000, 'grass')
-      .setOrigin(0)
-      .setMask(mask.createGeometryMask());
+        if (pair.bodyA.label === 'ground') {
+          onCollideEndCallback(pair);
+        }
+      }
+    });
 
     this.sprite.setCollisionCategory(COLLISION_CATEGORIES.GROUND);
   }
@@ -132,7 +127,7 @@ export default class GroundEntity {
   }
 
   pointIsOnGround(x, y) {
-    return Phaser.Geom.Polygon.Contains(this.polygon, x, y);
+    return true; // Phaser.Geom.Polygon.Contains(this.polygon, x, y);
   }
 
   getRandomPosition() {
