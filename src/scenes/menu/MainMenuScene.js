@@ -56,6 +56,17 @@ class MainMenuScene extends BaseScene {
 
     this.drawActiveUsers();
 
+    const menuHolderRect = new Phaser.Geom.Rectangle(232, 202, 346, 426);
+    const menuHolderGraphics = this.add.graphics({
+      fillStyle: {
+        color: 0xffffff,
+        alpha: 0.8
+      }
+    });
+
+    menuHolderGraphics.fillRectShape(menuHolderRect);
+    this.add.graphics(menuHolderGraphics);
+
     buttons.push(this.add.image(400, 270, 'NewGameButton').setInteractive());
     buttons.push(this.add.image(400, 370, 'ResumeGameButton').setInteractive());
     buttons.push(this.add.image(400, 470, 'RulesButton').setInteractive());
@@ -74,34 +85,27 @@ class MainMenuScene extends BaseScene {
   }
 
   drawActiveUsers() {
-    const borderRect = new Phaser.Geom.Rectangle(680, 200, 350, 430);
     const activeUsersRect = new Phaser.Geom.Rectangle(682, 202, 346, 426);
-    const line = new Phaser.Geom.Line(780, 300, 960, 300);
+    const line = new Phaser.Geom.Line(760, 300, 950, 300);
 
-    const borderGraphics = this.add.graphics({
-      fillStyle: {
-        color: 0x000000
-      }
-    });
     const activeUsersGraphics = this.add.graphics({
       fillStyle: {
-        color: 0xffffff
+        color: 0x183274,
+        alpha: 0.8
       }
     });
 
-    borderGraphics.fillRectShape(borderRect);
     activeUsersGraphics.fillRectShape(activeUsersRect);
 
-    activeUsersGraphics.lineStyle(2, 0x000000);
+    activeUsersGraphics.lineStyle(2, 0xffffff);
     activeUsersGraphics.strokeLineShape(line);
 
     this.add.text(750, 250, 'Players online now', {
-      fontFamily: 'Arial',
-      fontSize: 25,
-      color: '#000000'
+      fontFamily: 'Pixeled',
+      fontSize: 14,
+      color: '#ffffff'
     });
 
-    this.add.graphics(borderGraphics);
     this.add.graphics(activeUsersGraphics);
 
     this.drawUsersList(5);
@@ -110,35 +114,35 @@ class MainMenuScene extends BaseScene {
   drawUsersList(maxPlayersCount) {
     let printedUsersCount = 0;
     let printStartPositionY = 400;
-    const printStartPositionX = 740;
-    const tableSpace = 70;
+    const printStartPositionX = 760;
+    const tableSpace = 80;
     
     this.add.text(730, 350, 'Levels', {
-      fontFamily: 'Arial',
-      fontSize: 25,
-      color: '#000000'
+      fontFamily: 'Pixeled',
+      fontSize: 15,
+      color: '#ffffff'
     });
-    this.add.text(890, 350, 'Players', {
-      fontFamily: 'Arial',
-      fontSize: 25,
-      color: '#000000'
+    this.add.text(880, 350, 'Players', {
+      fontFamily: 'Pixeled',
+      fontSize: 15,
+      color: '#ffffff'
     });
 
     this.players.map(player => {
       if (printedUsersCount <= maxPlayersCount) {
         this.add.text(printStartPositionX, printStartPositionY, player.level, {
-          fontFamily: 'Arial',
-          fontSize: 25,
-          color: '#000000'
+          fontFamily: 'Pixeled',
+          fontSize: 15,
+          color: '#ffffff'
         });
         this.add.text(
           printStartPositionX + tableSpace,
           printStartPositionY,
           player.name,
           {
-            fontFamily: 'Arial',
-            fontSize: 25,
-            color: '#000000'
+            fontFamily: 'Pixeled',
+            fontSize: 15,
+            color: '#ffffff'
           }
         );
         printedUsersCount++;
