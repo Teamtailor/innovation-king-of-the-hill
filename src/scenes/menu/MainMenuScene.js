@@ -27,16 +27,16 @@ class MainMenuScene extends Phaser.Scene {
 
     this.drawActiveUsers();
 
-    this.add.text(230, 100, 'Welcome to Teamtailor\'s King of the Hill', {
+    this.add.text(300, 100, 'Welcome to Teamtailor\'s King of the Hill', {
       fontFamily: 'Arial',
       fontSize: 45,
       color: '#000000'
     });
 
-    buttons.push(this.add.image(380, 270, 'NewGameButton').setInteractive());
-    buttons.push(this.add.image(380, 370, 'ResumeGameButton').setInteractive());
-    buttons.push(this.add.image(380, 470, 'RulesButton').setInteractive());
-    buttons.push(this.add.image(380, 570, 'ScoreboardButton').setInteractive());
+    buttons.push(this.add.image(440, 270, 'NewGameButton').setInteractive());
+    buttons.push(this.add.image(440, 370, 'ResumeGameButton').setInteractive());
+    buttons.push(this.add.image(440, 470, 'RulesButton').setInteractive());
+    buttons.push(this.add.image(440, 570, 'ScoreboardButton').setInteractive());
 
     this.resizeElements(buttons, 280, 90);
     
@@ -51,9 +51,9 @@ class MainMenuScene extends Phaser.Scene {
   }
 
   drawActiveUsers() {
-    const borderRect = new Phaser.Geom.Rectangle(650, 200, 350, 430);
-    const activeUsersRect = new Phaser.Geom.Rectangle(652, 202, 346, 426);
-    const line = new Phaser.Geom.Line(720, 300, 900, 300);
+    const borderRect = new Phaser.Geom.Rectangle(710, 200, 350, 430);
+    const activeUsersRect = new Phaser.Geom.Rectangle(712, 202, 346, 426);
+    const line = new Phaser.Geom.Line(780, 300, 960, 300);
 
     const borderGraphics = this.add.graphics({
       fillStyle: {
@@ -72,7 +72,7 @@ class MainMenuScene extends Phaser.Scene {
     activeUsersGraphics.lineStyle(2, 0x000000);
     activeUsersGraphics.strokeLineShape(line);
 
-    this.add.text(710, 250, 'Players online now', {
+    this.add.text(770, 250, 'Players online now', {
       fontFamily: 'Arial',
       fontSize: 25,
       color: '#000000'
@@ -87,15 +87,15 @@ class MainMenuScene extends Phaser.Scene {
   drawUsersList(maxPlayersCount) {
     let printedUsersCount = 0;
     let printStartPositionY = 400;
-    const printStartPositionX = 720;
+    const printStartPositionX = 780;
     const tableSpace = 70;
     
-    this.add.text(690, 350, 'Levels', {
+    this.add.text(750, 350, 'Levels', {
       fontFamily: 'Arial',
       fontSize: 25,
       color: '#000000'
     });
-    this.add.text(830, 350, 'Players', {
+    this.add.text(890, 350, 'Players', {
       fontFamily: 'Arial',
       fontSize: 25,
       color: '#000000'
