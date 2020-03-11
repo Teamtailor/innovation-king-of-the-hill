@@ -47,7 +47,7 @@ class GameScene extends BaseScene {
       10,
       'Controls:\nPush: Arrows & Space\nTank: WASD & R\nMouse: Click & B\nGo to menu: Esc',
       {
-        fontFamily: 'Arial',
+        fontFamily: 'Pixeled',
         fontSize: 12,
         color: '#00ff00'
       }

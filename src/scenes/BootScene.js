@@ -10,10 +10,11 @@ class BootScene extends Phaser.Scene {
 
   preload() {
     var progress = this.add.graphics();
+    this.cameras.main.setBackgroundColor(0x183274);
 
     this.load.on('progress', value => {
       progress.clear();
-      progress.fillStyle(0x990000, 1);
+      progress.fillStyle(0xf43f85, 1);
       progress.fillRect(
         0,
         this.sys.game.config.width / 2 - 60,
@@ -58,10 +59,20 @@ class BootScene extends Phaser.Scene {
     this.load.image('arm', 'assets/arm.png');
 
     // Menu buttons preload
-    this.load.image('NewGameButton', 'assets/images/buttons/menu/ng.png');
-    this.load.image('ResumeGameButton', 'assets/images/buttons/menu/rg.png');
-    this.load.image('RulesButton', 'assets/images/buttons/menu/rs.png');
-    this.load.image('ScoreboardButton', 'assets/images/buttons/menu/sb.png');
+    this.load.spritesheet('NewGameButton', '../assets/images/buttons/menu/ng.png', {
+      frameWidth: 620, frameHeight: 200
+    });
+    this.load.spritesheet('ResumeGameButton', '../assets/images/buttons/menu/rg.png', {
+      frameWidth: 620, frameHeight: 200
+    });
+    this.load.spritesheet('RulesButton', '../assets/images/buttons/menu/rs.png', {
+      frameWidth: 620, frameHeight: 200
+    });
+    this.load.spritesheet('ScoreboardButton', '../assets/images/buttons/menu/sb.png', {
+      frameWidth: 620, frameHeight: 200
+    });
+
+    this.load.image('MenuBackground', '../assets/images/background.png');
   }
 
   create() {
