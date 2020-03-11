@@ -33,22 +33,22 @@ class BootScene extends Phaser.Scene {
 
     this.load.image(
       'rikard',
-      '//res.cloudinary.com/teamtailor/image/upload/c_thumb,f_auto,h_48,q_auto,w_48/v1579613249/eeld6pvvmqdr62rrm872'
+      '//res.cloudinary.com/teamtailor/image/upload/c_thumb,f_auto,h_480,q_auto,w_480/v1579613249/eeld6pvvmqdr62rrm872'
     );
 
     this.load.image(
       'anders',
-      '//res.cloudinary.com/teamtailor/image/upload/c_thumb,f_auto,h_48,q_auto,w_48/v1558438753/vb6clw0qtuip4d42bhxw'
+      '//res.cloudinary.com/teamtailor/image/upload/c_thumb,f_auto,h_480,q_auto,w_480/v1558438753/vb6clw0qtuip4d42bhxw'
     );
 
     this.load.image(
       'adrian',
-      '//res.cloudinary.com/teamtailor/image/upload/c_thumb,f_auto,h_48,q_auto,w_48/v1582796431/ct7zszureniopzzldgdz'
+      '//res.cloudinary.com/teamtailor/image/upload/c_thumb,f_auto,h_480,q_auto,w_480/v1582796431/ct7zszureniopzzldgdz'
     );
 
     this.load.image(
       'ramya',
-      '//res.cloudinary.com/teamtailor/c_thumb,f_auto,h_48,q_auto,w_48/v1568805770/ojwnlxauurjdhp3bpby3'
+      '//res.cloudinary.com/teamtailor/c_thumb,f_auto,h_480,q_auto,w_480/v1568805770/ojwnlxauurjdhp3bpby3'
     );
 
     this.load.image('grass', 'assets/images/grass.jpg');

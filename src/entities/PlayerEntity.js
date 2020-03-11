@@ -24,7 +24,7 @@ export default class PlayerEntity {
 
     this.maskShape = scene.make
       .graphics()
-      .fillCircleShape(new Phaser.Geom.Circle(0, 0, 22));
+      .fillCircleShape(new Phaser.Geom.Circle(0, 0, 220));
 
     this.border = scene.add
       .graphics({
@@ -32,7 +32,7 @@ export default class PlayerEntity {
           color
         }
       })
-      .fillCircleShape(new Phaser.Geom.Circle(0, 0, 24));
+      .fillCircleShape(new Phaser.Geom.Circle(0, 0, 240));
 
     this.matterObj = scene.matter.add.image(
       scene.game.config.width / 2,
@@ -43,7 +43,7 @@ export default class PlayerEntity {
         label: 'player-' + image,
         shape: {
           type: 'circle',
-          radius: 24
+          radius: 240
         },
         frictionAir: 0.2,
         restitution: 4,
@@ -51,9 +51,18 @@ export default class PlayerEntity {
       }
     );
     this.matterObj.setCollisionCategory(COLLISION_CATEGORIES.PLAYER);
-    this.matterObj.setCollidesWith(COLLISION_CATEGORIES.POWER_UP | COLLISION_CATEGORIES.PLAYER | COLLISION_CATEGORIES.GROUND);
-
+    this.matterObj.setCollidesWith(
+      COLLISION_CATEGORIES.POWER_UP |
+        COLLISION_CATEGORIES.PLAYER |
+        COLLISION_CATEGORIES.GROUND
+    );
     this.matterObj.setMask(this.maskShape.createGeometryMask());
+
+    // workaround to get higher res images
+    this.startScale = 0.1;
+    this.matterObj.setScale(this.startScale);
+    this.maskShape.setScale(this.startScale);
+    this.border.setScale(this.startScale);
 
     this.strength = 1;
     this.fatigue = 0;
@@ -120,10 +129,10 @@ export default class PlayerEntity {
       thrust += this.applySpeedModifiers(-0.05);
     }
     if (left.isDown && !this.boosting) {
-      this.matterObj.setAngularVelocity(this.applySpeedModifiers(-0.1));
+      this.matterObj.setAngularVelocity(-0.1);
     }
     if (right.isDown && !this.boosting) {
-      this.matterObj.setAngularVelocity(this.applySpeedModifiers(0.1));
+      this.matterObj.setAngularVelocity(0.1);
     }
 
     if (boost) {
@@ -183,7 +192,7 @@ export default class PlayerEntity {
 
       this.scene.tweens.add({
         targets: [this.matterObj, this.maskShape, this.border],
-        scale: 1.2,
+        scale: this.maskShape.scale * 1.4,
         ease: 'linear',
         duration: 100,
         yoyo: true,
@@ -249,7 +258,7 @@ export default class PlayerEntity {
     this.matterObj.destroy();
     this.border.destroy();
     this.maskShape.destroy();
-    this.powerUps.forEach((powerUp) => powerUp.destroy());
+    this.powerUps.forEach(powerUp => powerUp.destroy());
     this.powerUps = [];
   }
 
@@ -321,13 +330,13 @@ export default class PlayerEntity {
     const {
       body, scale
     } = this.matterObj;
-    const newScale = scale + (scaleModifier * sign);
+    const newScale = scale + this.startScale * scaleModifier * sign;
 
-    this.matterObj.setDensity(body.density + (densityModifier * sign));
+    this.matterObj.setDensity(body.density + densityModifier * sign);
     this.maskShape.setScale(newScale);
     this.matterObj.setScale(newScale);
     this.border.setScale(newScale);
-    this.strength += (strengthModifier * sign);
+    this.strength += strengthModifier * sign;
   }
 
   speedUp(value) {
