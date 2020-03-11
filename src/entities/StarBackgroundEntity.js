@@ -27,7 +27,6 @@ export default class StarBackgroundEntity {
       star.sprite.setOrigin(0.5, 0.7);
       this.randomizeStar(star, true);
       this.stars.push(star);
-      console.log(star.sprite);
     }
 
     setInterval(() => {
