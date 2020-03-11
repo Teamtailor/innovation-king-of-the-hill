@@ -54,7 +54,8 @@ class BootScene extends Phaser.Scene {
     this.load.image('star', 'assets/images/star.png');
 
     this.load.json('shapes', 'assets/shapes.json');
-    this.load.image('level', 'assets/images/level.png');
+    this.load.image('level', 'assets/level.png');
+    this.load.image('arm', 'assets/arm.png');
 
     // Menu buttons preload
     this.load.image('NewGameButton', 'assets/images/buttons/menu/ng.png');
