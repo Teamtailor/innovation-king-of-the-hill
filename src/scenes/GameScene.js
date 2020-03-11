@@ -1,5 +1,6 @@
 import PlayerEntity from '../entities/PlayerEntity';
 import GroundEntity from '../entities/GroundEntity';
+import StarBackgroundEntity from '../entities/StarBackgroundEntity';
 import PowerUpService from '../services/PowerUpService';
 import constants from '../config/constants';
 
@@ -72,6 +73,10 @@ class GameScene extends Phaser.Scene {
   create() {
     this.adjustCamera();
     this.scale.on('resize', this.resize, this);
+
+    this.stars = new StarBackgroundEntity({
+      scene: this
+    });
 
     this.ground = new GroundEntity({
       scene: this,
@@ -202,6 +207,8 @@ class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+    this.stars.update(delta);
+
     this.players.forEach(p => {
       p.update(time, delta);
     });

@@ -80,16 +80,6 @@ export default class GroundEntity {
       0xff0000
     );
 
-    // const maskShape = poly.createGeometryMask();
-
-    // console.log(poly, this._polygon);
-
-    /* const bg = this.scene.add
-      .tileSprite(-1000, -1000, 3000, 3000, 'grass')
-      .setOrigin(0);
-*/
-    // console.log(bg);
-
     this.sprite = this.scene.matter.add.gameObject(poly, {
       shape: {
         type: 'fromVerts',
@@ -102,22 +92,29 @@ export default class GroundEntity {
       onCollideEndCallback: onCollideEndCallback
     });
 
-    const graphics = this.scene.add.graphics().fillPoints(PATH);
-    graphics.x = this.scene.game.config.width / 2 - this.sprite.displayOriginX;
-    graphics.y = this.scene.game.config.height / 2 - this.sprite.displayOriginY;
+    const mask = this.scene.make
+      .graphics({
+        x: this.scene.game.config.width / 2 - this.sprite.displayOriginX,
+        y: this.scene.game.config.height / 2 - this.sprite.displayOriginY
+      })
+      .fillPoints(PATH);
 
-    const bg = this.scene.add
+    for (var i = 0; i < 50; i += 2) {
+      this.scene.add
+        .graphics({
+          x: this.scene.game.config.width / 2 - this.sprite.displayOriginX,
+          y: this.scene.game.config.height / 2 - this.sprite.displayOriginY + i,
+          fillStyle: {
+            color: 0x8c3b0c
+          }
+        })
+        .fillPoints(PATH);
+    }
+
+    this.scene.add
       .tileSprite(-1000, -1000, 3000, 3000, 'grass')
       .setOrigin(0)
-      .setMask(this.sprite.createGeometryMask(graphics));
-
-    console.log(
-      this.sprite,
-      graphics,
-      this.sprite.createGeometryMask(graphics),
-      this.sprite.originY * this.sprite.height,
-      this.sprite.displayOriginY
-    );
+      .setMask(mask.createGeometryMask());
   }
 
   get polygon() {
