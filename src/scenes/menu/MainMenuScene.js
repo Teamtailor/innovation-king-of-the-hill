@@ -67,10 +67,10 @@ class MainMenuScene extends BaseScene {
     menuHolderGraphics.fillRectShape(menuHolderRect);
     this.add.graphics(menuHolderGraphics);
 
-    buttons.push(this.add.image(400, 270, 'NewGameButton').setInteractive());
-    buttons.push(this.add.image(400, 370, 'ResumeGameButton').setInteractive());
-    buttons.push(this.add.image(400, 470, 'RulesButton').setInteractive());
-    buttons.push(this.add.image(400, 570, 'ScoreboardButton').setInteractive());
+    buttons.push(this.add.sprite(400, 270, 'NewGameButton', 0).setInteractive());
+    buttons.push(this.add.sprite(400, 370, 'ResumeGameButton', 0).setInteractive());
+    buttons.push(this.add.sprite(400, 470, 'RulesButton', 0).setInteractive());
+    buttons.push(this.add.sprite(400, 570, 'ScoreboardButton', 0).setInteractive());
 
     this.resizeElements(buttons, 280, 90);
 
@@ -78,6 +78,24 @@ class MainMenuScene extends BaseScene {
     buttons[1].on('pointerdown', this.goToGame.bind(this));
     buttons[2].on('pointerdown', this.goToRules.bind(this));
     buttons[3].on('pointerdown', this.goToScoreboard.bind(this));
+
+    buttons[0].on('pointerover', this.setHover);
+    buttons[1].on('pointerover', this.setHover);
+    buttons[2].on('pointerover', this.setHover);
+    buttons[3].on('pointerover', this.setHover);
+
+    buttons[0].on('pointerout', this.disableHover);
+    buttons[1].on('pointerout', this.disableHover);
+    buttons[2].on('pointerout', this.disableHover);
+    buttons[3].on('pointerout', this.disableHover);
+  }
+
+  setHover() {
+    this.setFrame(1);
+  }
+
+  disableHover() {
+    this.setFrame(0);
   }
 
   resizeElements(buttons, width, height) {
