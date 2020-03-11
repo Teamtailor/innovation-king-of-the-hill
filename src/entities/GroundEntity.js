@@ -2,69 +2,6 @@ import {
   COLLISION_CATEGORIES
 } from '../config/constants';
 
-const PATH = [
-  {
-    x: 50,
-    y: 50
-  },
-  {
-    x: 150,
-    y: 0
-  },
-  {
-    x: 430,
-    y: 55
-  },
-  {
-    x: 900,
-    y: 15
-  },
-  {
-    x: 1020,
-    y: 45
-  },
-  {
-    x: 1060,
-    y: 175
-  },
-  {
-    x: 1000,
-    y: 275
-  },
-  {
-    x: 1080,
-    y: 325
-  },
-  {
-    x: 990,
-    y: 450
-  },
-  {
-    x: 800,
-    y: 620
-  },
-  {
-    x: 600,
-    y: 500
-  },
-  {
-    x: 550,
-    y: 440
-  },
-  {
-    x: 520,
-    y: 380
-  },
-  {
-    x: 150,
-    y: 445
-  },
-  {
-    x: 40,
-    y: 250
-  }
-];
-
 const GROUND_POSITION_MARGIN = 30;
 
 export default class GroundEntity {
@@ -78,12 +15,6 @@ export default class GroundEntity {
 
     var shapes = this.scene.cache.json.get('shapes');
 
-    var [{
-      vertices
-    }] = shapes.level.fixtures;
-
-    this._polygon = new Phaser.Geom.Polygon(vertices.flat()); // not working :shrug:
-
     this.sprite = this.scene.matter.add.sprite(
       scene.game.config.width / 2,
       scene.game.config.height / 2,
@@ -94,7 +25,7 @@ export default class GroundEntity {
       }
     );
 
-    // this needed to be done because of bug when importing shape from PhysicsEditor
+    // this needed to be done because of a bug when importing shape from PhysicsEditor (cant set regular callback)
     this.scene.matter.world.on('collisionstart', function(event) {
       for (var i = 0; i < event.pairs.length; i++) {
         const pair = event.pairs[i];
@@ -118,16 +49,15 @@ export default class GroundEntity {
     this.sprite.setCollisionCategory(COLLISION_CATEGORIES.GROUND);
   }
 
-  get polygon() {
-    return this._polygon;
-  }
-
-  get path() {
-    return this.polygon.points;
-  }
-
   pointIsOnGround(x, y) {
-    return true; // Phaser.Geom.Polygon.Contains(this.polygon, x, y);
+    const bodies = this.scene.matter.world.getAllBodies();
+    const groundBodies = bodies.filter(b => b.label === 'ground');
+    const isOnGround = !!this.scene.matter.query.point(groundBodies, {
+      x,
+      y
+    }).length;
+
+    return isOnGround;
   }
 
   getRandomPosition() {
@@ -141,9 +71,11 @@ export default class GroundEntity {
       width - GROUND_POSITION_MARGIN * 2,
       height - GROUND_POSITION_MARGIN * 2
     );
+
     let point = rect.getRandomPoint();
 
-    while (!this.pointIsOnGround(point.x, point.y)) {
+    // give this 20 tries to not lock the process
+    for (var i = 0; !this.pointIsOnGround(point.x, point.y) || i < 20; i++) {
       point = rect.getRandomPoint();
     }
 
