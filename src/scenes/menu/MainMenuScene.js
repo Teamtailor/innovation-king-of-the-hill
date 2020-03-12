@@ -1,5 +1,4 @@
 import BaseScene from '../BaseScene';
-import constants from '../../config/constants';
 
 class MainMenuScene extends BaseScene {
   constructor() {
@@ -18,37 +17,10 @@ class MainMenuScene extends BaseScene {
     ];
   }
 
-  resize(gameSize, baseSize, displaySize, resolution) {
-    this.adjustCamera();
-  }
-
-  adjustCamera() {
-    const {
-      main
-    } = this.cameras;
-
-    const {
-      gameSize
-    } = main.scaleManager;
-
-    const zoomX = gameSize.width / constants.WIDTH;
-    const zoomY = gameSize.height / constants.HEIGHT;
-    const zoom = zoomX > zoomY ? zoomY : zoomX;
-
-    if (!this.follow) {
-      main.setZoom(zoom);
-      main.centerOn(constants.WIDTH / 2, constants.HEIGHT / 2);
-    } else {
-      main.setZoom(zoom * 2);
-    }
-  }
-
   preload() {}
 
   create() {
     super.create();
-    this.adjustCamera();
-    this.scale.on('resize', this.resize, this);
     this.clickSound = this.sound.add('ClickSound');
 
     const buttons = [];
