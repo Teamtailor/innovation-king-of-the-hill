@@ -1,6 +1,7 @@
 import {
   COLLISION_CATEGORIES
 } from '../config/constants';
+import PlayerAvatar from './PlayerAvatar';
 
 export default class PlayerEntity {
   powerUps = [];
@@ -40,20 +41,7 @@ export default class PlayerEntity {
     this.matterObj.setCollisionCategory(COLLISION_CATEGORIES.PLAYER);
     this.matterObj.setCollidesWith(0); // nothing until we have spawned
 
-    this.maskShape = scene.make
-      .graphics()
-      .fillCircleShape(new Phaser.Geom.Circle(0, 0, 220));
-
-    this.border = scene.add
-      .graphics({
-        fillStyle: {
-          color
-        }
-      })
-      .fillCircleShape(new Phaser.Geom.Circle(0, 0, 240));
-
-    this.avatarImage = scene.add.image(0, 0, image);
-    this.avatarImage.setMask(this.maskShape.createGeometryMask());
+    this.playerAvatar = new PlayerAvatar(scene, image, color);
 
     this.keys = scene.input.keyboard.addKeys(controls);
 
@@ -179,7 +167,7 @@ export default class PlayerEntity {
       this.boosting = true;
 
       this.scene.tweens.add({
-        targets: [this.avatarImage, this.maskShape, this.border],
+        targets: this.playerAvatar.targets,
         scale: (this.startScale + this.startScale * this.growthModifier) * 1.4,
         ease: 'linear',
         duration: 100,
@@ -188,12 +176,9 @@ export default class PlayerEntity {
         onComplete: () => {
           this.boosting = false;
 
-          const newScale =
-            this.startScale + this.startScale * this.growthModifier;
-
-          [this.avatarImage, this.maskShape, this.border].forEach(e => {
-            e.setScale(newScale);
-          });
+          this.playerAvatar.setScale(
+            this.startScale + this.startScale * this.growthModifier
+          );
         }
       });
 
@@ -250,16 +235,13 @@ export default class PlayerEntity {
   }
 
   updateMask() {
-    this.avatarImage.setRotation(this.matterObj.rotation);
-    this.avatarImage.setPosition(this.matterObj.x, this.matterObj.y);
-    this.border.setPosition(this.matterObj.x, this.matterObj.y);
-    this.maskShape.setPosition(this.matterObj.x, this.matterObj.y);
+    this.playerAvatar.setRotation(this.matterObj.rotation);
+    this.playerAvatar.setPosition(this.matterObj.x, this.matterObj.y);
   }
 
   destroy() {
     this.matterObj.destroy();
-    this.border.destroy();
-    this.maskShape.destroy();
+    this.playerAvatar.destroy();
     this.powerUps.forEach(powerUp => powerUp.destroy());
     this.powerUps = [];
   }
@@ -275,11 +257,6 @@ export default class PlayerEntity {
     this.speedModifier = 1;
     this.growthModifier = 0;
 
-    this.matterObj.setScale(this.startScale);
-    this.avatarImage.setScale(this.startScale);
-    this.maskShape.setScale(this.startScale);
-    this.border.setScale(this.startScale);
-
     this.matterObj.setFrictionAir(this.startFriction);
     this.matterObj.setBounce(this.startRestitution);
     this.matterObj.setDensity(this.startDensity);
@@ -293,8 +270,10 @@ export default class PlayerEntity {
         COLLISION_CATEGORIES.GROUND
     );
 
-    const groundPosition = this.scene.getRandomGroundPosition();
+    this.matterObj.setScale(this.startScale);
+    this.playerAvatar.setScale(this.startScale);
 
+    const groundPosition = this.scene.getRandomGroundPosition();
     this.matterObj.setPosition(groundPosition.x, groundPosition.y);
   }
 
@@ -303,7 +282,7 @@ export default class PlayerEntity {
       this.isAlive = false;
 
       this.scene.tweens.add({
-        targets: [this.avatarImage, this.maskShape, this.border],
+        targets: this.playerAvatar.targets,
         scale: 0,
         ease: 'linear',
         duration: 1000,
@@ -379,10 +358,8 @@ export default class PlayerEntity {
     const newScale = this.startScale + this.startScale * this.growthModifier;
 
     this.matterObj.setDensity(body.density + densityModifier * sign);
-    this.avatarImage.setScale(newScale);
-    this.maskShape.setScale(newScale);
     this.matterObj.setScale(newScale);
-    this.border.setScale(newScale);
+    this.playerAvatar.setScale(newScale);
     this.strength += strengthModifier * sign;
   }
 

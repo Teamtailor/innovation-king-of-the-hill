@@ -22,7 +22,6 @@ class GameScene extends BaseScene {
 
   create() {
     super.create();
-    this.uiScene = this.scene.launch('UiScene');
 
     const escButton = this.input.keyboard.addKey('esc');
     this.adjustCamera();
@@ -42,6 +41,10 @@ class GameScene extends BaseScene {
 
     this.createPlayers();
     this.powerUpService.start();
+
+    this.uiScene = this.scene.launch('UiScene', {
+      players: this.players
+    });
   }
 
   getRandomGroundPosition() {
