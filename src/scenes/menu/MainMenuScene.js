@@ -21,8 +21,6 @@ class MainMenuScene extends BaseScene {
 
   create() {
     super.create();
-    this.clickSound = this.sound.add('ClickSound');
-
     const buttons = [];
 
     this.add.image(-110, -50, 'MenuBackground').setOrigin(0).setScale(1.7);
@@ -69,18 +67,6 @@ class MainMenuScene extends BaseScene {
     buttons[1].on('pointerout', this.disableHover);
     buttons[2].on('pointerout', this.disableHover);
     buttons[3].on('pointerout', this.disableHover);
-  }
-
-  setHover() {
-    this.setFrame(1);
-  }
-
-  disableHover() {
-    this.setFrame(0);
-  }
-
-  resizeElements(buttons, width, height) {
-    buttons.map(button => button.setDisplaySize(width, height));
   }
 
   drawActiveUsers() {
@@ -158,7 +144,7 @@ class MainMenuScene extends BaseScene {
 
   goToRules() {
     this.clickSound.play();
-    console.log('rules');
+    this.scene.start('RulesScene');
   }
 
   goToScoreboard() {

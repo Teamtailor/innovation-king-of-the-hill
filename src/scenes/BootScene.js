@@ -1,4 +1,5 @@
 import MainMenuScene from './menu/MainMenuScene';
+import RulesScene from './menu/RulesScene';
 import GameScene from './GameScene';
 
 class BootScene extends Phaser.Scene {
@@ -71,6 +72,9 @@ class BootScene extends Phaser.Scene {
     this.load.spritesheet('ScoreboardButton', '../assets/images/buttons/menu/sb.png', {
       frameWidth: 620, frameHeight: 200
     });
+    this.load.spritesheet('BackToMenuButton', '../assets/images/buttons/menu/btm.png', {
+      frameWidth: 620, frameHeight: 200
+    });
 
     this.load.image('MenuBackground', '../assets/images/background.png');
 
@@ -80,6 +84,7 @@ class BootScene extends Phaser.Scene {
 
   create() {
     this.scene.add('MainMenuScene', MainMenuScene);
+    this.scene.add('RulesScene', RulesScene);
     this.scene.add('GameScene', GameScene);
 
     this.scene.start('MainMenuScene');

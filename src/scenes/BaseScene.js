@@ -4,6 +4,7 @@ export default class BaseScene extends Phaser.Scene {
   create() {
     this.adjustCamera();
     this.scale.on('resize', this.resize, this);
+    this.clickSound = this.sound.add('ClickSound');
   }
 
   resize(gameSize, baseSize, displaySize, resolution) {
@@ -46,6 +47,23 @@ export default class BaseScene extends Phaser.Scene {
     this.cameras.main.startFollow(object);
 
     this.adjustCamera();
+  }
+
+  setHover() {
+    this.setFrame(1);
+  }
+
+  disableHover() {
+    this.setFrame(0);
+  }
+
+  goToMainMenu() {
+    this.clickSound.play();
+    this.scene.start('MainMenuScene');
+  }
+
+  resizeElements(buttons, width, height) {
+    buttons.map(button => button.setDisplaySize(width, height));
   }
 
   stopFollow(object, skipAdjust) {
