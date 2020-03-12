@@ -60,26 +60,47 @@ class BootScene extends Phaser.Scene {
     this.load.image('arm', 'assets/arm.png');
 
     // Menu buttons preload
-    this.load.spritesheet('NewGameButton', '../assets/images/buttons/menu/ng.png', {
-      frameWidth: 620, frameHeight: 200
+    this.load.spritesheet(
+      'NewGameButton',
+      'assets/images/buttons/menu/ng.png',
+      {
+        frameWidth: 620,
+        frameHeight: 200
+      }
+    );
+    this.load.spritesheet(
+      'ResumeGameButton',
+      'assets/images/buttons/menu/rg.png',
+      {
+        frameWidth: 620,
+        frameHeight: 200
+      }
+    );
+    this.load.spritesheet('RulesButton', 'assets/images/buttons/menu/rs.png', {
+      frameWidth: 620,
+      frameHeight: 200
     });
-    this.load.spritesheet('ResumeGameButton', '../assets/images/buttons/menu/rg.png', {
-      frameWidth: 620, frameHeight: 200
-    });
-    this.load.spritesheet('RulesButton', '../assets/images/buttons/menu/rs.png', {
-      frameWidth: 620, frameHeight: 200
-    });
-    this.load.spritesheet('ScoreboardButton', '../assets/images/buttons/menu/sb.png', {
-      frameWidth: 620, frameHeight: 200
-    });
-    this.load.spritesheet('BackToMenuButton', '../assets/images/buttons/menu/btm.png', {
-      frameWidth: 620, frameHeight: 200
-    });
+    this.load.spritesheet(
+      'ScoreboardButton',
+      'assets/images/buttons/menu/sb.png',
+      {
+        frameWidth: 620,
+        frameHeight: 200
+      }
+    );
+    this.load.spritesheet(
+      'BackToMenuButton',
+      'assets/images/buttons/menu/btm.png',
+      {
+        frameWidth: 620,
+        frameHeight: 200
+      }
+    );
 
-    this.load.image('MenuBackground', '../assets/images/background.png');
+    this.load.image('MenuBackground', 'assets/images/background.png');
 
     // Sounds
-    this.load.audio('ClickSound', '../assets/sounds/click.mp3');
+    this.load.audio('ClickSound', 'assets/sounds/click.mp3');
   }
 
   create() {
