@@ -14,3 +14,18 @@ export const COLLISION_CATEGORIES = {
   PLAYER: 0x04,
   POWER_UP: 0x08
 };
+
+export const POWER_UP_CONFIG = {
+  Grow: {
+    label: 'FED UP!',
+    duration: 4000
+  },
+  Slip: {
+    label: 'SLIPPIN\'',
+    duration: 200
+  },
+  SpeedUp: {
+    label: 'SPEED UP!',
+    duration: 2500
+  }
+};

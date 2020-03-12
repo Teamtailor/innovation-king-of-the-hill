@@ -1,12 +1,8 @@
 import PowerUpBase from './PowerUpBase';
 
-const LIFETIME = 200;
 const SLIP_AMOUNT = 0.08;
 
 export default class Slip extends PowerUpBase {
-  effectLifeTime = LIFETIME;
-  label = 'SLIPPIN\'';
-
   constructor(scene, x, y) {
     super(scene, x, y, 'banana');
     this.setScale(0.2);

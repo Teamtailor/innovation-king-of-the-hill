@@ -1,5 +1,5 @@
 import {
-  COLLISION_CATEGORIES
+  COLLISION_CATEGORIES, POWER_UP_CONFIG
 } from '../../config/constants';
 
 export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
@@ -17,6 +17,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
     super(scene.matter.world, x, y, texture);
     this.id = scene.time.now + '' + Phaser.Math.Between(1000000, 9999999);
     this.scene = scene;
+    this.applyConfig();
   }
 
   init() {
@@ -29,6 +30,15 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
     this.scene.add.existing(this);
     this.addRemoveTimerEvent();
     return this;
+  }
+
+  applyConfig() {
+    const {
+      label, duration
+    } = POWER_UP_CONFIG[this.constructor.name];
+
+    this.label = label;
+    this.effectLifeTime = duration;
   }
 
   addRemoveTimerEvent() {
@@ -79,6 +89,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
       this.idleTimerEvent.destroy();
     }
 
+    this.addTextAnimation();
     this.animateConsumation(() => {
       console.log('Power up animation complete', this);
       this.destroy();
