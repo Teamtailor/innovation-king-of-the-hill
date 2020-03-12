@@ -52,7 +52,7 @@ class BootScene extends Phaser.Scene {
       '//res.cloudinary.com/teamtailor/c_thumb,f_auto,h_480,q_auto,w_480/v1568805770/ojwnlxauurjdhp3bpby3'
     );
 
-    this.load.image('grass', 'assets/images/grass.jpg');
+    this.load.image('transparent', 'assets/images/transparent.png');
     this.load.image('star', 'assets/images/star.png');
 
     this.load.json('shapes', 'assets/shapes.json');

@@ -30,6 +30,16 @@ export default class PlayerEntity {
     this.useMouse = useMouse;
     this.useTankControls = useTankControls;
 
+    this.matterObj = scene.matter.add.image(-1000, -1000, 'transparent', null, {
+      label: 'player-' + image,
+      shape: {
+        type: 'circle',
+        radius: 240
+      }
+    });
+    this.matterObj.setCollisionCategory(COLLISION_CATEGORIES.PLAYER);
+    this.matterObj.setCollidesWith(0); // nothing until we have spawned
+
     this.maskShape = scene.make
       .graphics()
       .fillCircleShape(new Phaser.Geom.Circle(0, 0, 220));
@@ -44,16 +54,6 @@ export default class PlayerEntity {
 
     this.avatarImage = scene.add.image(0, 0, image);
     this.avatarImage.setMask(this.maskShape.createGeometryMask());
-
-    this.matterObj = scene.matter.add.image(-1000, -1000, null, null, {
-      label: 'player-' + image,
-      shape: {
-        type: 'circle',
-        radius: 240
-      }
-    });
-    this.matterObj.setCollisionCategory(COLLISION_CATEGORIES.PLAYER);
-    this.matterObj.setCollidesWith(0); // nothing until we have spawned
 
     this.keys = scene.input.keyboard.addKeys(controls);
 
