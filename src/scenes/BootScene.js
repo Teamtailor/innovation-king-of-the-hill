@@ -30,7 +30,7 @@ class BootScene extends Phaser.Scene {
     });
 
     for (var i = 0; i < 10; i++) {
-      this.load.image('avatar' + i, '//robohash.org/' + i + '?size=48x48');
+      this.load.image('avatar' + i, '//robohash.org/' + i + '?size=480x480');
     }
 
     this.load.image(
