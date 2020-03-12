@@ -73,6 +73,9 @@ class BootScene extends Phaser.Scene {
     });
 
     this.load.image('MenuBackground', '../assets/images/background.png');
+
+    // Sounds
+    this.load.audio('ClickSound', '../assets/sounds/click.mp3');
   }
 
   create() {

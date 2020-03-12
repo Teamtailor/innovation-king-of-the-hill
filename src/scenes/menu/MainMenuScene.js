@@ -49,6 +49,7 @@ class MainMenuScene extends BaseScene {
     super.create();
     this.adjustCamera();
     this.scale.on('resize', this.resize, this);
+    this.clickSound = this.sound.add('ClickSound');
 
     const buttons = [];
 
@@ -179,14 +180,17 @@ class MainMenuScene extends BaseScene {
   }
 
   goToGame() {
+    this.clickSound.play();
     this.scene.start('GameScene');
   }
 
   goToRules() {
+    this.clickSound.play();
     console.log('rules');
   }
 
   goToScoreboard() {
+    this.clickSound.play();
     console.log('scores');
   }
 }
