@@ -15,6 +15,7 @@ export default class PowerUpService {
     Object.values(POWER_UP_CONFIG.TYPES).forEach(({
       svgAsset
     }) => {
+      console.log('loading', svgAsset);
       this.scene.load.svg(svgAsset, 'assets/svg/' + svgAsset + '.svg');
     });
   }
