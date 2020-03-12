@@ -10,6 +10,7 @@ const GROW_MODIFIERS = {
 
 export default class Grow extends PowerUpBase {
   effectLifeTime = LIFETIME;
+  label = 'FED UP!';
 
   constructor(scene, x, y) {
     super(scene, x, y, 'pizza');

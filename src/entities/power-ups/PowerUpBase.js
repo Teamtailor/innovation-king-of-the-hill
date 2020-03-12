@@ -11,6 +11,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   id = null;
   isDestroyed = false;
   isConsumed = false;
+  label = null;
 
   constructor (scene, x, y, texture) {
     super(scene.matter.world, x, y, texture);
@@ -81,6 +82,39 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
     this.animateConsumation(() => {
       console.log('Power up animation complete', this);
       this.destroy();
+    });
+  }
+
+  addTextAnimation() {
+    if (this.label === null) {
+      return;
+    }
+    const label = this.scene.add.text(this.x, this.y, this.label, {
+      fontFamily: 'Pixeled',
+      fontSize: 14,
+      color: '#ffbe00'
+    });
+    label.setOrigin(0.5);
+    label.setDepth(1);
+
+    this.scene.tweens.add({
+      targets: [label],
+      scale: 2.8,
+      angle: Math.random() > 0.5 ? 50 : -50,
+      ease: 'Cubic',
+      duration: 1000,
+      yoyo: false,
+      repeat: 0,
+      onUpdate({
+        progress
+      }) {
+        if (progress > 0.5) {
+          label.setAlpha(1 + (0.5 - progress) * 2);
+        }
+      },
+      onComplete: () => {
+        label.destroy();
+      }
     });
   }
 
