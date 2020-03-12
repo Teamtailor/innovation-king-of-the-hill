@@ -1,3 +1,8 @@
+import Grow from '../entities/power-ups/Grow';
+import SpeedUp from '../entities/power-ups/SpeedUp';
+import Slip from '../entities/power-ups/Slip';
+import Drunk from '../entities/power-ups/Drunk';
+
 const SCALE = 1;
 
 // Make it divisible by eight for pixelArt
@@ -20,25 +25,29 @@ export const POWER_UP_CONFIG = {
   MAX_SPAWN_TIME: 3500,
 
   TYPES: {
-    Grow: {
+    [Grow.name]: {
+      PowerUpClass: Grow,
       label: 'FED UP!',
       duration: 4000,
       svgScale: 0.2,
       svgAsset: 'pizza'
     },
-    Slip: {
+    [Slip.name]: {
+      PowerUpClass: Slip,
       label: 'SLIPPIN\'',
       duration: 200,
       svgScale: 0.2,
       svgAsset: 'banana'
     },
-    SpeedUp: {
+    [SpeedUp.name]: {
+      PowerUpClass: SpeedUp,
       label: 'SPEED UP!',
       duration: 2500,
       svgScale: 0.08,
       svgAsset: 'soda-can'
     },
-    Drunk: {
+    [Drunk.name]: {
+      PowerUpClass: Drunk,
       label: 'FEELING DIZZY',
       duration: 3000,
       svgScale: 0.18,
