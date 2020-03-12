@@ -16,8 +16,8 @@ export const COLLISION_CATEGORIES = {
 };
 
 export const POWER_UP_CONFIG = {
-  MIN_SPAWN_TIME: 2000,
-  MAX_SPAWN_TIME: 5500,
+  MIN_SPAWN_TIME: 1500,
+  MAX_SPAWN_TIME: 3500,
 
   TYPES: {
     Grow: {
