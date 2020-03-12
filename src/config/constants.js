@@ -24,7 +24,6 @@ export const POWER_UP_CONFIG = {
       label: 'FED UP!',
       duration: 4000,
       svgScale: 0.2,
-
       svgAsset: 'pizza'
     },
     Slip: {
