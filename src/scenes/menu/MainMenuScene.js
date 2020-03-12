@@ -8,16 +8,15 @@ class MainMenuScene extends BaseScene {
     super({
       key: 'MainMenuScene'
     });
-    this.players = [
-      {
-        name: 'Adrian Wojdat',
-        level: 2
-      },
-      {
-        name: 'Rikard Wissing',
-        level: 1
-      }
-    ];
+    this.playersList = [];
+    this.socket = window.SocketIO;
+    const urlString = window.location.href;
+    const url = new URL(urlString);
+    this.user = {
+      name: url.searchParams.get('user'),
+      level: url.searchParams.get('level'),
+      avatar: url.searchParams.get('avatar')
+    };
   }
 
   preload() {}
@@ -81,6 +80,36 @@ class MainMenuScene extends BaseScene {
     buttons[1].on('pointerout', this.disableHover);
     buttons[2].on('pointerout', this.disableHover);
     buttons[3].on('pointerout', this.disableHover);
+
+    this.listenToSocket();
+  }
+
+  listenToSocket() {
+    this.user.id = this.uuidv4();
+    this.user.order = this.getRandomInt(10000);
+
+    this.socket.emit('register', this.user);
+
+    this.socket.on('activeUsers', (players) => {
+      players = players.sort((a, b) => (a.order > b.order) ? 1 : -1);
+      this.drawUsersList(5, players);
+    });
+
+    this.socket.on('reportActive', (msg) => {
+      this.socket.emit('present', this.user);
+    });
+  }
+
+  uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0; const
+        v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
   }
 
   drawActiveUsers() {
@@ -106,15 +135,15 @@ class MainMenuScene extends BaseScene {
     });
 
     this.add.graphics(activeUsersGraphics);
-
-    this.drawUsersList(5);
   }
 
-  drawUsersList(maxPlayersCount) {
+  drawUsersList(maxPlayersCount, players) {
     let printedUsersCount = 0;
     let printStartPositionY = 400;
     const printStartPositionX = 760;
-    const tableSpace = 80;
+    const tableSpace = 150;
+    
+    this.clearPlayersList();
 
     this.add.text(730, 350, 'Levels', {
       fontFamily: 'Pixeled',
@@ -127,14 +156,15 @@ class MainMenuScene extends BaseScene {
       color: '#ffffff'
     });
 
-    this.players.map(player => {
-      if (printedUsersCount <= maxPlayersCount) {
-        this.add.text(printStartPositionX, printStartPositionY, player.level, {
+    players.map(player => {
+      const playerElement = {};
+      if (printedUsersCount < maxPlayersCount) {
+        playerElement.level = this.add.text(printStartPositionX, printStartPositionY, player.level, {
           fontFamily: 'Pixeled',
           fontSize: 15,
           color: '#ffffff'
         });
-        this.add.text(
+        playerElement.name = this.add.text(
           printStartPositionX + tableSpace,
           printStartPositionY,
           player.name,
@@ -147,8 +177,16 @@ class MainMenuScene extends BaseScene {
         printedUsersCount++;
         printStartPositionY += 40;
       }
+      this.playersList.push(playerElement);
     });
-    console.log(this.players);
+  }
+
+  clearPlayersList() {
+    this.playersList.map(player => {
+      player.level.destroy();
+      player.name.destroy();
+    });
+    this.playersList = [];
   }
 
   goToGame() {
