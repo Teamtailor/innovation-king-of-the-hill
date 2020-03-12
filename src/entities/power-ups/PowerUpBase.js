@@ -17,7 +17,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
 
   init() {
     this.setCollisionCategory(COLLISION_CATEGORIES.POWER_UP);
-    this.setCollidesWith(COLLISION_CATEGORIES.POWER_UP | COLLISION_CATEGORIES.PLAYER);
+    this.setCollidesWith(COLLISION_CATEGORIES.PLAYER | COLLISION_CATEGORIES.GROUND);
     this.setOnCollide(this.handleCollision.bind(this));
     this.setRandomRotation();
     this.setLabel();

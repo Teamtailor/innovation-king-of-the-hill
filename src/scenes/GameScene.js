@@ -3,6 +3,9 @@ import PlayerEntity from '../entities/PlayerEntity';
 import GroundEntity from '../entities/GroundEntity';
 import StarBackgroundEntity from '../entities/StarBackgroundEntity';
 import PowerUpService from '../services/PowerUpService';
+import {
+  COLLISION_CATEGORIES
+} from '../config/constants';
 
 class GameScene extends BaseScene {
   constructor() {
@@ -70,15 +73,20 @@ class GameScene extends BaseScene {
   enteringGround({
     bodyA, bodyB
   }) {
-    console.log(bodyA, bodyB);
+    if (bodyB.collisionFilter.category !== COLLISION_CATEGORIES.PLAYER) {
+      return;
+    }
     const player = this.getPlayerFromBody(bodyB);
-
     player.addToGround(bodyA);
   }
 
   async leavingGround({
     bodyA, bodyB
   }) {
+    if (bodyB.collisionFilter.category !== COLLISION_CATEGORIES.PLAYER) {
+      return;
+    }
+
     const player = this.getPlayerFromBody(bodyB);
     player.removeFromGround(bodyA);
 

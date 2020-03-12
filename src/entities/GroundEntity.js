@@ -47,6 +47,7 @@ export default class GroundEntity {
     });
 
     this.sprite.setCollisionCategory(COLLISION_CATEGORIES.GROUND);
+    this.sprite.setCollidesWith(COLLISION_CATEGORIES.POWER_UP | COLLISION_CATEGORIES.PLAYER);
   }
 
   pointIsOnGround(x, y) {
