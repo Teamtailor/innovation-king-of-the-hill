@@ -17,7 +17,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
 
   constructor (scene, x, y, texture) {
     super(scene.matter.world, x, y, texture);
-    this.id = scene.time.now + '' + Phaser.Math.Between(1000000, 9999999);
+    this.id = scene.generateId();
     this.scene = scene;
     this.applyConfig();
   }

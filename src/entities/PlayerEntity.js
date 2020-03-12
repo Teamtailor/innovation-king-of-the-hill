@@ -1,5 +1,5 @@
 import {
-  COLLISION_CATEGORIES
+  COLLISION_CATEGORIES, GAME_CONFIG
 } from '../config/constants';
 import PlayerAvatar from './PlayerAvatar';
 
@@ -15,6 +15,7 @@ export default class PlayerEntity {
   startDensity = 0.005;
   startFriction = 0.2;
   growthModifier = 0;
+  id = null;
 
   constructor(
     scene,
@@ -30,6 +31,7 @@ export default class PlayerEntity {
     this.scene = scene;
     this.useMouse = useMouse;
     this.useTankControls = useTankControls;
+    this.id = scene.generateId();
 
     this.matterObj = scene.matter.add.image(-1000, -1000, 'transparent', null, {
       label: 'player-' + image,
@@ -73,8 +75,8 @@ export default class PlayerEntity {
           .normalize()
           .multiply(
             new Phaser.Math.Vector2(
-              this.applySpeedModifiers(0.05),
-              this.applySpeedModifiers(0.05)
+              this.applySpeedModifiers(GAME_CONFIG.DEFAULT_SPEED),
+              this.applySpeedModifiers(GAME_CONFIG.DEFAULT_SPEED)
             )
           );
 
@@ -99,10 +101,10 @@ export default class PlayerEntity {
     let thrust = 0;
 
     if (up.isDown) {
-      thrust += this.applySpeedModifiers(0.05);
+      thrust += this.applySpeedModifiers(GAME_CONFIG.DEFAULT_SPEED);
     }
     if (down.isDown) {
-      thrust += this.applySpeedModifiers(-0.05);
+      thrust += this.applySpeedModifiers(-GAME_CONFIG.DEFAULT_SPEED);
     }
     if (left.isDown && !this.boosting) {
       this.matterObj.setAngularVelocity(-0.1);
@@ -131,16 +133,16 @@ export default class PlayerEntity {
     const force = new Phaser.Math.Vector2(0, 0);
 
     if (up.isDown) {
-      force.add(new Phaser.Math.Vector2(0.0, this.applySpeedModifiers(-0.05)));
+      force.add(new Phaser.Math.Vector2(0.0, this.applySpeedModifiers(-GAME_CONFIG.DEFAULT_SPEED)));
     }
     if (down.isDown) {
-      force.add(new Phaser.Math.Vector2(0.0, this.applySpeedModifiers(0.05)));
+      force.add(new Phaser.Math.Vector2(0.0, this.applySpeedModifiers(GAME_CONFIG.DEFAULT_SPEED)));
     }
     if (left.isDown) {
-      force.add(new Phaser.Math.Vector2(this.applySpeedModifiers(-0.05), 0));
+      force.add(new Phaser.Math.Vector2(this.applySpeedModifiers(-GAME_CONFIG.DEFAULT_SPEED), 0));
     }
     if (right.isDown) {
-      force.add(new Phaser.Math.Vector2(this.applySpeedModifiers(0.05), 0));
+      force.add(new Phaser.Math.Vector2(this.applySpeedModifiers(GAME_CONFIG.DEFAULT_SPEED), 0));
     }
 
     this.matterObj.applyForce(force);
@@ -387,5 +389,13 @@ export default class PlayerEntity {
 
   setReversedControls(value) {
     this.reverseControls = value;
+  }
+
+  getPosition() {
+    return new Phaser.Geom.Point(this.matterObj.x, this.matterObj.y);
+  }
+
+  getSpeed() {
+    return this.matterObj.body.speed;
   }
 }

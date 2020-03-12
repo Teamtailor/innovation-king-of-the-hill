@@ -1,5 +1,6 @@
 import BaseScene from './BaseScene';
 import PlayerEntity from '../entities/PlayerEntity';
+import AiPlayerEntity from '../entities/AiPlayerEntity';
 import GroundEntity from '../entities/GroundEntity';
 import StarBackgroundEntity from '../entities/StarBackgroundEntity';
 import PowerUpService from '../services/PowerUpService';
@@ -8,6 +9,8 @@ import {
 } from '../config/constants';
 
 class GameScene extends BaseScene {
+  generatedCount = 0;
+
   constructor() {
     super({
       key: 'GameScene'
@@ -135,6 +138,34 @@ class GameScene extends BaseScene {
         useMouse: true
       })
     );
+
+    this.players.push(
+      new AiPlayerEntity(this, {
+        image: 'avatar1',
+        color: 0xFF00FF
+      })
+    );
+
+    this.players.push(
+      new AiPlayerEntity(this, {
+        image: 'avatar2',
+        color: 0xFF5522
+      })
+    );
+
+    this.players.push(
+      new AiPlayerEntity(this, {
+        image: 'avatar3',
+        color: 0x00FF99
+      })
+    );
+
+    this.players.push(
+      new AiPlayerEntity(this, {
+        image: 'avatar4',
+        color: 0x5500AA
+      })
+    );
   }
 
   update(time, delta) {
@@ -145,6 +176,11 @@ class GameScene extends BaseScene {
     });
 
     this.powerUpService.update(time, delta);
+  }
+
+  generateId() {
+    console.log('Generated count', this.generatedCount);
+    return this.time.now + '' + this.generatedCount++;
   }
 }
 

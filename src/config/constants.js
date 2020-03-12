@@ -12,6 +12,10 @@ export default {
   SCALE: SCALE
 };
 
+export const GAME_CONFIG = {
+  DEFAULT_SPEED: 0.05
+};
+
 export const COLLISION_CATEGORIES = {
   NONE: 0x00,
   DEFAULT: 0x01,
