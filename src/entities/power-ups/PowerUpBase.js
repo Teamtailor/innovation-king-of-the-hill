@@ -4,15 +4,18 @@ import {
 
 export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   scene = null;
-  timerEvent = null;
-  lifeTime = 0;
+  effectWornOutTimerEvent = null;
+  idleTimerEvent = null;
+  effectLifeTime = 0;
+  idleLifetime = 3000;
   id = null;
+  isDestroyed = false;
+  isConsumed = false;
 
   constructor (scene, x, y, texture) {
     super(scene.matter.world, x, y, texture);
     this.id = scene.time.now + '' + Phaser.Math.Between(1000000, 9999999);
     this.scene = scene;
-    this.scene.add.existing(this);
   }
 
   init() {
@@ -22,7 +25,30 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
     this.setRandomRotation();
     this.setLabel();
     this.setSensor(true);
+    this.scene.add.existing(this);
+    this.addRemoveTimerEvent();
     return this;
+  }
+
+  addRemoveTimerEvent() {
+    this.idleTimerEvent = this.scene.time.addEvent({
+      delay: this.idleLifetime,
+      callback: this.onTooLongIdleEvent,
+      callbackScope: this
+    });
+  }
+
+  onTooLongIdleEvent() {
+    if (this.isConsumed) {
+      return;
+    }
+    console.log('Start idle animation', this);
+
+    this.animateTooLongIdle(() => {
+      console.log('Start idle animation complete', this);
+      this.isDestroyed = true;
+      this.destroy();
+    });
   }
 
   setRandomRotation() {
@@ -38,10 +64,22 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   }
 
   consume(playerBody) {
+    const player = this.scene.getPlayerFromBody(playerBody);
+
     this.setCollisionCategory(COLLISION_CATEGORIES.NONE);
-    this.attachToPlayer(this.scene.getPlayerFromBody(playerBody));
+    this.attachToPlayer(player);
+    this.isConsumed = true;
+
+    console.log('Consuming power up', {
+      player, powerUp: this
+    });
+
+    if (this.idleTimerEvent) {
+      this.idleTimerEvent.destroy();
+    }
+
     this.animateConsumation(() => {
-      console.log('Animation complete', this);
+      console.log('Power up animation complete', this);
       this.destroy();
     });
   }
@@ -62,6 +100,18 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
     });
   }
 
+  animateTooLongIdle(onComplete) {
+    this.scene.tweens.add({
+      targets: [this],
+      scale: 0,
+      ease: 'Cubic',
+      duration: 350,
+      yoyo: false,
+      repeat: 0,
+      onComplete: onComplete
+    });
+  }
+
   handleCollision({
     bodyA, bodyB
   }) {
@@ -75,9 +125,9 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   attachToPlayer(player) {
     player.addPowerUp(this);
 
-    this.timerEvent = this.scene.time.addEvent({
-      delay: this.lifeTime,
-      callback: this.onTimerEventComplete,
+    this.effectWornOutTimerEvent = this.scene.time.addEvent({
+      delay: this.effectLifeTime,
+      callback: this.onEffecWornOut,
       callbackScope: this,
       args: [player]
     });
@@ -88,9 +138,13 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   detachFromPlayer(player) {
     player.removePowerUp(this);
     this.onDetachFromPlayer(player);
+
+    console.log('Power up worn out', {
+      player, powerUp: this
+    });
   }
 
-  onTimerEventComplete(player) {
+  onEffecWornOut(player) {
     this.detachFromPlayer(player);
   }
 }

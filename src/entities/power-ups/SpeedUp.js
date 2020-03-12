@@ -4,7 +4,7 @@ const LIFETIME = 2500;
 const SPEED_MODIFIER = 1.2;
 
 export default class SpeedUp extends PowerUpBase {
-  lifeTime = LIFETIME;
+  effectLifeTime = LIFETIME;
 
   constructor(scene, x, y) {
     super(scene, x, y, 'soda-can');
