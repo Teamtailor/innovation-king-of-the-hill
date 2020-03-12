@@ -185,8 +185,7 @@ class GameScene extends BaseScene {
   }
 
   generateId() {
-    console.log('Generated count', this.generatedCount);
-    return this.time.now + '' + this.generatedCount++;
+    return 'ID__' + parseInt(this.time.now) + '__' + this.generatedCount++;
   }
 }
 
