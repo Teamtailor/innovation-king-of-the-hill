@@ -125,37 +125,9 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   addTextAnimation({
     scene, x, y
   }, text) {
-    if (!text) {
-      return;
-    }
-    let label = scene.add.text(x, y, text, {
-      fontFamily: 'Pixeled',
-      fontSize: 14,
-      color: '#ffbe00'
-    });
-    label.setOrigin(0.5);
-    label.setDepth(DEPTHS.AIR);
-
-    scene.tweens.add({
-      targets: [label],
-      scale: 2.8,
-      angle: Math.random() > 0.5 ? 50 : -50,
-      ease: 'Cubic',
-      duration: 1000,
-      yoyo: false,
-      repeat: 0,
-      onUpdate({
-        progress
-      }) {
-        if (progress > 0.5) {
-          label.setAlpha(1 + (0.5 - progress) * 2);
-        }
-      },
-      onComplete: () => {
-        label.destroy();
-        label = null;
-      }
-    });
+    scene.addTextAnimation({
+      x, y
+    }, text);
   }
 
   onAnimateConsumationComplete() {

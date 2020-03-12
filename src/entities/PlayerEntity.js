@@ -65,11 +65,17 @@ export default class PlayerEntity {
   }
 
   onCollideCallback({
-    bodyB
+    bodyA, bodyB
   }) {
-    if (bodyB.collisionFilter.category === COLLISION_CATEGORIES.PLAYER) {
+    if (
+      bodyB.collisionFilter.category === COLLISION_CATEGORIES.PLAYER &&
+      bodyA.collisionFilter.category === COLLISION_CATEGORIES.PLAYER
+    ) {
       // collided with another player
-      const collidedPlayer = this.scene.getPlayerFromBody(bodyB);
+      let collidedPlayer = this.scene.getPlayerFromBody(bodyB);
+      if (collidedPlayer === this) {
+        collidedPlayer = this.scene.getPlayerFromBody(bodyA);
+      }
 
       this.lastCollidedPlayers = this.lastCollidedPlayers.filter(
         ({
@@ -311,6 +317,9 @@ export default class PlayerEntity {
     this.speedModifier = 1;
     this.growthModifier = 0;
 
+    this.powerUps.forEach(powerUp => powerUp.destroy());
+    this.powerUps = [];
+
     this.matterObj.setFrictionAir(this.startFriction);
     this.matterObj.setBounce(this.startRestitution);
     this.matterObj.setDensity(this.startDensity);
@@ -330,10 +339,52 @@ export default class PlayerEntity {
 
     const groundPosition = this.scene.getRandomGroundPosition();
     this.matterObj.setPosition(groundPosition.x, groundPosition.y);
+
+    this.scene.updateScoreboard();
+  }
+
+  updateDeathScores() {
+    this.deaths += 1;
+
+    const now = Date.now();
+    const assistingPlayers = this.lastCollidedPlayers
+      .filter(({
+        time
+      }) => {
+        return now - time < 200;
+      })
+      .map(({
+        player
+      }) => player);
+
+    assistingPlayers.reverse();
+    const [killingPlayer, assistingPlayer] = assistingPlayers;
+
+    if (killingPlayer) {
+      killingPlayer.kills += 1;
+      const phrases = ['HA!', 'SEE YA!', 'BYE!'];
+      const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+      this.scene.addTextAnimation(killingPlayer.matterObj, phrase);
+    }
+
+    if (assistingPlayer) {
+      assistingPlayer.assists += 1;
+      this.scene.addTextAnimation(assistingPlayer.matterObj, 'ASSIST');
+    }
+
+    if (!killingPlayer) {
+      this.suicides += 1;
+      const phrases = ['DAMMIT!', 'NOOO!', 'OOPS!'];
+      const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+      this.scene.addTextAnimation(this.matterObj, phrase);
+    }
+
+    this.scene.updateScoreboard();
   }
 
   fall() {
     return new Promise(resolve => {
+      this.updateDeathScores();
       this.isAlive = false;
       this.playerAvatar.setDepth(DEPTHS.UNDER_GROUND);
 
@@ -346,31 +397,6 @@ export default class PlayerEntity {
         repeat: 0,
         onComplete: () => {
           setTimeout(() => {
-            this.deaths += 1;
-
-            const now = Date.now();
-            const assistingPlayers = this.lastCollidedPlayers
-              .filter(({
-                time
-              }) => {
-                return now - time < 4000;
-              })
-              .map(({
-                player
-              }) => player);
-
-            assistingPlayers.forEach(p => {
-              p.assists += 1;
-            });
-
-            const [killingPlayer] = assistingPlayers;
-            if (killingPlayer) {
-              killingPlayer.kills += 1;
-            } else {
-              this.suicides += 1;
-            }
-
-            this.scene.updateScoreboard();
             resolve();
           }, 1000);
         }
@@ -411,14 +437,17 @@ export default class PlayerEntity {
 
   addPowerUp(powerUp) {
     this.powerUps.push(powerUp);
+    this.scene.updateScoreboard();
   }
 
   removePowerUp(powerUp) {
     const index = this.powerUps.findIndex(pu => pu.id === powerUp.id);
-    if (index > -1) {
+    if (index === -1) {
       return;
     }
+
     this.powerUps.splice(index, 1);
+    this.scene.updateScoreboard();
   }
 
   grow(sizeModifiers) {

@@ -5,6 +5,7 @@ class UiScene extends BaseScene {
   playerAvatars = [];
   killTexts = [];
   deathTexts = [];
+  powerUps = [];
 
   constructor() {
     super({
@@ -25,6 +26,10 @@ class UiScene extends BaseScene {
       this.game.config.width / 2 -
       ((this.playerAvatars.length - 1) / 2) * distance;
     const y = this.game.config.height - 50;
+
+    this.powerUps.forEach(pU => {
+      pU.destroy();
+    });
 
     this.players.forEach((p, i) => {
       const playerAvatar = this.playerAvatars[i];
