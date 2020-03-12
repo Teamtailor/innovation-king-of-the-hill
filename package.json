@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack --mode=development",
+    "startprodtest": "webpack --mode=development  --config webpack.productiontest.config.js",
     "build": "webpack  --mode=production --config webpack.production.config.js",
     "test": "eslint ./src/**/**.js",
     "lint": "eslint src --max-warnings 0",
