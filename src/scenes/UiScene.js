@@ -23,7 +23,7 @@ class UiScene extends BaseScene {
     let x =
       this.game.config.width / 2 -
       ((this.playerAvatars.length - 1) / 2) * distance;
-    const y = this.game.config.height;
+    const y = this.game.config.height - 50;
 
     this.players.forEach((p, i) => {
       const playerAvatar = this.playerAvatars[i];
