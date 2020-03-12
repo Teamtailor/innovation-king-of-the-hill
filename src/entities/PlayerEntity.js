@@ -4,8 +4,16 @@ import {
 
 export default class PlayerEntity {
   powerUps = [];
+  grounds = [];
+  useMouse = false;
+  useTankControls = false;
   speedModifier = 1;
   isAlive = true;
+  startScale = 0.1; // workaround to get higher res images
+  startRestitution = 4;
+  startDensity = 0.005;
+  startFriction = 0.2;
+  growthModifier = 0;
 
   constructor(
     scene,
@@ -19,7 +27,6 @@ export default class PlayerEntity {
     }
   ) {
     this.scene = scene;
-    this.grounds = [];
     this.useMouse = useMouse;
     this.useTankControls = useTankControls;
 
@@ -36,23 +43,17 @@ export default class PlayerEntity {
       .fillCircleShape(new Phaser.Geom.Circle(0, 0, 240));
 
     this.avatarImage = scene.add.image(0, 0, image);
+    this.avatarImage.setMask(this.maskShape.createGeometryMask());
 
     this.matterObj = scene.matter.add.image(-1000, -1000, null, null, {
       label: 'player-' + image,
       shape: {
         type: 'circle',
         radius: 240
-      },
-      frictionAir: 0.2,
-      restitution: 4,
-      density: 0.005
+      }
     });
     this.matterObj.setCollisionCategory(COLLISION_CATEGORIES.PLAYER);
-    this.matterObj.setCollidesWith(0); // nothing until we have spawn
-
-    // workaround to get higher res images
-    this.startScale = 0.1;
-    this.avatarImage.setMask(this.maskShape.createGeometryMask());
+    this.matterObj.setCollidesWith(0); // nothing until we have spawned
 
     this.keys = scene.input.keyboard.addKeys(controls);
 
@@ -270,15 +271,20 @@ export default class PlayerEntity {
     this.fatigue = 0;
     this.boosting = false;
     this.chargingBoost = false;
+    this.reverseControls = false;
+    this.speedModifier = 1;
+    this.growthModifier = 0;
 
     this.matterObj.setScale(this.startScale);
     this.avatarImage.setScale(this.startScale);
     this.maskShape.setScale(this.startScale);
     this.border.setScale(this.startScale);
 
-    this.matterObj.setRotation(0);
+    this.matterObj.setFrictionAir(this.startFriction);
+    this.matterObj.setBounce(this.startRestitution);
+    this.matterObj.setDensity(this.startDensity);
 
-    console.log(this.matterObj);
+    this.matterObj.setRotation(0);
 
     this.matterObj.setCollisionCategory(COLLISION_CATEGORIES.PLAYER);
     this.matterObj.setCollidesWith(
@@ -287,10 +293,9 @@ export default class PlayerEntity {
         COLLISION_CATEGORIES.GROUND
     );
 
-    this.matterObj.setPosition(
-      this.scene.game.config.width / 2,
-      this.scene.game.config.height / 2
-    );
+    const groundPosition = this.scene.getRandomGroundPosition();
+
+    this.matterObj.setPosition(groundPosition.x, groundPosition.y);
   }
 
   fall() {
@@ -364,8 +369,6 @@ export default class PlayerEntity {
     this.changeSize(sizeModifiers, -1);
   }
 
-  growthModifier = 0;
-
   changeSize({
     strengthModifier, scaleModifier, densityModifier
   }, sign = 1) {
@@ -373,7 +376,6 @@ export default class PlayerEntity {
       body
     } = this.matterObj;
     this.growthModifier += scaleModifier * sign;
-
     const newScale = this.startScale + this.startScale * this.growthModifier;
 
     this.matterObj.setDensity(body.density + densityModifier * sign);
