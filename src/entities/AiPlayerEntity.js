@@ -4,14 +4,17 @@ import {
   GAME_CONFIG
 } from '../config/constants';
 
+const TARGET_TIREDNESS_TIME = 3500;
+
 export default class AiPlayerEntity extends PlayerEntity {
   disableController = true;
   target = null;
+  lastTargetTime = 0;
 
   update(time, delta) {
     super.update(time, delta);
     if (this.isAlive) {
-      this.updateTarget();
+      this.updateTarget(time);
       this.move();
     }
   }
@@ -24,10 +27,27 @@ export default class AiPlayerEntity extends PlayerEntity {
     this.target = null;
   }
 
-  updateTarget() {
-    if (this.target === null || !this.target.isAlive) {
-      this.target = Math.random() > 0.3333 ? this.findClosestTarget() : this.findSomeTarget();
+  updateTarget(time) {
+    if (this.shouldGetNewTarget()) {
+      this.setTarget(Math.random() > 0.3333 ? this.findClosestTarget() : this.findSomeTarget(), time);
+    } else if (this.tiredOfChasing(time)) {
+      this.setTarget(this.findSomeTarget(), time);
     }
+  }
+
+  setTarget(target, time) {
+    if (target) {
+      this.target = target;
+      this.lastTargetTime = time;
+    }
+  }
+
+  shouldGetNewTarget() {
+    return this.target === null || !this.target.isAlive;
+  }
+
+  tiredOfChasing(time) {
+    return this.lastTargetTime + TARGET_TIREDNESS_TIME < time;
   }
 
   move() {
