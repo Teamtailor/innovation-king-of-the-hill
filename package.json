@@ -8,6 +8,7 @@
     "start": "webpack --mode=development",
     "startprodtest": "webpack --mode=development  --config webpack.productiontest.config.js",
     "build": "webpack  --mode=production --config webpack.production.config.js",
+    "multiplayer": "yarn build && node app.js",
     "test": "eslint ./src/**/**.js",
     "lint": "eslint src --max-warnings 0",
     "lintfix": "yarn lint -- --fix"
@@ -36,6 +37,8 @@
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
-    "phaser": "3.22.0"
+    "express": "^4.17.1",
+    "phaser": "3.22.0",
+    "socket.io-client": "^2.3.0"
   }
 }
