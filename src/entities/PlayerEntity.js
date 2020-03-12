@@ -346,4 +346,18 @@ export default class PlayerEntity {
   slowDown(value) {
     this.speedModifier -= value;
   }
+
+  slip(slipAmount) {
+    const {
+      friction
+    } = this.matterObj.body;
+    this.matterObj.setFrictionAir(friction - slipAmount);
+  }
+
+  unslip(slipAmount) {
+    const {
+      friction
+    } = this.matterObj.body;
+    this.matterObj.setFrictionAir(friction + slipAmount);
+  }
 }

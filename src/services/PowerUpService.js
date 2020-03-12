@@ -1,12 +1,14 @@
 import Grow from '../entities/power-ups/Grow';
 import SpeedUp from '../entities/power-ups/SpeedUp';
+import Slip from '../entities/power-ups/Slip';
 
 const MIN_SPAWN_TIME = 2000;
 const MAX_SPAWN_TIME = 5500;
 
 const POWER_UPS = [
   Grow,
-  SpeedUp
+  SpeedUp,
+  Slip
 ];
 
 export default class PowerUpService {
@@ -20,6 +22,7 @@ export default class PowerUpService {
   preload() {
     this.scene.load.svg('pizza', 'assets/svg/pizza.svg');
     this.scene.load.svg('soda-can', 'assets/svg/soda-can.svg');
+    this.scene.load.svg('banana', 'assets/svg/banana.svg');
   }
 
   start() {
