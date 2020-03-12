@@ -72,6 +72,6 @@ module.exports = {
     ]
   },
   optimization: {
-    minimize: true
+    minimize: false
   }
 };
