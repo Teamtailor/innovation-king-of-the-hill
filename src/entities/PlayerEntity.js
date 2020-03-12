@@ -192,13 +192,16 @@ export default class PlayerEntity {
 
       this.scene.tweens.add({
         targets: [this.matterObj, this.maskShape, this.border],
-        scale: this.maskShape.scale * 1.4,
+        scale: (this.startScale + this.startScale * this.growthModifier) * 1.4,
         ease: 'linear',
         duration: 100,
         yoyo: true,
         repeat: 0,
         onComplete: () => {
           this.boosting = false;
+          this.matterObj.setScale(
+            this.startScale + this.startScale * this.growthModifier
+          );
         }
       });
 
@@ -324,13 +327,17 @@ export default class PlayerEntity {
     this.changeSize(sizeModifiers, -1);
   }
 
+  growthModifier = 0;
+
   changeSize({
     strengthModifier, scaleModifier, densityModifier
   }, sign = 1) {
     const {
-      body, scale
+      body
     } = this.matterObj;
-    const newScale = scale + this.startScale * scaleModifier * sign;
+    this.growthModifier += scaleModifier * sign;
+
+    const newScale = this.startScale + this.startScale * this.growthModifier;
 
     this.matterObj.setDensity(body.density + densityModifier * sign);
     this.maskShape.setScale(newScale);
