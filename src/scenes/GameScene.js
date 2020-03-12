@@ -22,6 +22,7 @@ class GameScene extends BaseScene {
 
   create() {
     super.create();
+    this.uiScene = this.scene.launch('UiScene');
 
     const escButton = this.input.keyboard.addKey('esc');
     this.adjustCamera();
@@ -40,21 +41,7 @@ class GameScene extends BaseScene {
     });
 
     this.createPlayers();
-    this.createInstructions();
     this.powerUpService.start();
-  }
-
-  createInstructions() {
-    this.add.text(
-      10,
-      10,
-      'Controls:\nPush: Arrows & Space\nTank: WASD & R\nMouse: Click & B\nGo to menu: Esc',
-      {
-        fontFamily: 'Pixeled',
-        fontSize: 12,
-        color: '#00ff00'
-      }
-    );
   }
 
   getRandomGroundPosition() {

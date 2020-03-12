@@ -13,26 +13,23 @@ export default class BaseScene extends Phaser.Scene {
 
   adjustCamera() {
     const {
-      main
+      cameras, main
     } = this.cameras;
 
-    if (!main) {
-      return;
-    }
+    cameras.forEach(c => {
+      const {
+        gameSize
+      } = c.scaleManager;
 
-    const {
-      gameSize
-    } = main.scaleManager;
+      const zoomX = gameSize.width / constants.WIDTH;
+      const zoomY = gameSize.height / constants.HEIGHT;
+      const zoom = zoomX > zoomY ? zoomY : zoomX;
 
-    const zoomX = gameSize.width / constants.WIDTH;
-    const zoomY = gameSize.height / constants.HEIGHT;
-    const zoom = zoomX > zoomY ? zoomY : zoomX;
+      c.setZoom(zoom);
+    });
 
-    if (!this.follow) {
-      main.setZoom(zoom);
+    if (main && !this.follow) {
       main.centerOn(constants.WIDTH / 2, constants.HEIGHT / 2);
-    } else {
-      main.setZoom(zoom);
     }
   }
 
