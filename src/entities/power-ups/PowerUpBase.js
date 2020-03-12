@@ -34,11 +34,12 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
 
   applyConfig() {
     const {
-      label, duration
-    } = POWER_UP_CONFIG[this.constructor.name];
+      label, duration, svgScale
+    } = POWER_UP_CONFIG.TYPES[this.constructor.name];
 
     this.label = label;
     this.effectLifeTime = duration;
+    this.setScale(svgScale);
   }
 
   addRemoveTimerEvent() {

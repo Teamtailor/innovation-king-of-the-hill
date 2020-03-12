@@ -7,11 +7,6 @@ const GROW_MODIFIERS = {
 };
 
 export default class Grow extends PowerUpBase {
-  constructor(scene, x, y) {
-    super(scene, x, y, 'pizza');
-    this.setScale(0.2);
-  }
-
   onAttachToPlayer(player) {
     player.grow(GROW_MODIFIERS);
   }

@@ -1,11 +1,11 @@
 import Grow from '../entities/power-ups/Grow';
 import SpeedUp from '../entities/power-ups/SpeedUp';
 import Slip from '../entities/power-ups/Slip';
+import {
+  POWER_UP_CONFIG
+} from '../config/constants';
 
-const MIN_SPAWN_TIME = 2000;
-const MAX_SPAWN_TIME = 5500;
-
-const POWER_UPS = [
+const POWER_UP_CLASSES = [
   Grow,
   SpeedUp,
   Slip
@@ -20,9 +20,10 @@ export default class PowerUpService {
   }
 
   preload() {
-    this.scene.load.svg('pizza', 'assets/svg/pizza.svg');
-    this.scene.load.svg('soda-can', 'assets/svg/soda-can.svg');
-    this.scene.load.svg('banana', 'assets/svg/banana.svg');
+    POWER_UP_CLASSES.forEach(klass => {
+      const svgAsset = this.getSvgAssetFromClass(klass);
+      this.scene.load.svg(svgAsset, 'assets/svg/' + svgAsset + '.svg');
+    });
   }
 
   start() {
@@ -30,15 +31,20 @@ export default class PowerUpService {
   }
 
   setSpawnTime() {
-    this.nextSpawnTime = Phaser.Math.Between(MIN_SPAWN_TIME, MAX_SPAWN_TIME);
+    this.nextSpawnTime = Phaser.Math.Between(POWER_UP_CONFIG.MIN_SPAWN_TIME, POWER_UP_CONFIG.MAX_SPAWN_TIME);
   }
 
   spawn() {
     const {
       x, y
     } = this.scene.getRandomGroundPosition();
-    const index = Phaser.Math.Between(0, POWER_UPS.length - 1);
-    return new POWER_UPS[index](this.scene, x, y).init();
+    const index = Phaser.Math.Between(0, POWER_UP_CLASSES.length - 1);
+    const svgAsset = this.getSvgAssetFromClass(POWER_UP_CLASSES[index]);
+    return new POWER_UP_CLASSES[index](this.scene, x, y, svgAsset).init();
+  }
+
+  getSvgAssetFromClass(klass) {
+    return POWER_UP_CONFIG.TYPES[klass.name].svgAsset;
   }
 
   update(time) {

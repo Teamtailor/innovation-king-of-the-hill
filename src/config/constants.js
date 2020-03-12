@@ -16,16 +16,28 @@ export const COLLISION_CATEGORIES = {
 };
 
 export const POWER_UP_CONFIG = {
-  Grow: {
-    label: 'FED UP!',
-    duration: 4000
-  },
-  Slip: {
-    label: 'SLIPPIN\'',
-    duration: 200
-  },
-  SpeedUp: {
-    label: 'SPEED UP!',
-    duration: 2500
+  MIN_SPAWN_TIME: 2000,
+  MAX_SPAWN_TIME: 5500,
+
+  TYPES: {
+    Grow: {
+      label: 'FED UP!',
+      duration: 4000,
+      svgScale: 0.2,
+
+      svgAsset: 'pizza'
+    },
+    Slip: {
+      label: 'SLIPPIN\'',
+      duration: 200,
+      svgScale: 0.2,
+      svgAsset: 'banana'
+    },
+    SpeedUp: {
+      label: 'SPEED UP!',
+      duration: 2500,
+      svgScale: 0.08,
+      svgAsset: 'soda-can'
+    }
   }
 };
