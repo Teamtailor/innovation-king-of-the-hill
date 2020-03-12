@@ -92,7 +92,8 @@ class GameScene extends BaseScene {
 
     await player.finishBoosting();
     if (!player.isOnAnyGround()) {
-      this.killPlayer(player);
+      await player.fall();
+      player.spawn();
     }
   }
 

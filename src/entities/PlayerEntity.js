@@ -37,43 +37,26 @@ export default class PlayerEntity {
 
     this.avatarImage = scene.add.image(0, 0, image);
 
-    this.matterObj = scene.matter.add.image(
-      scene.game.config.width / 2,
-      scene.game.config.height / 2,
-      null,
-      null,
-      {
-        label: 'player-' + image,
-        shape: {
-          type: 'circle',
-          radius: 240
-        },
-        frictionAir: 0.2,
-        restitution: 4,
-        density: 0.005
-      }
-    );
+    this.matterObj = scene.matter.add.image(-1000, -1000, null, null, {
+      label: 'player-' + image,
+      shape: {
+        type: 'circle',
+        radius: 240
+      },
+      frictionAir: 0.2,
+      restitution: 4,
+      density: 0.005
+    });
     this.matterObj.setCollisionCategory(COLLISION_CATEGORIES.PLAYER);
-    this.matterObj.setCollidesWith(
-      COLLISION_CATEGORIES.POWER_UP |
-        COLLISION_CATEGORIES.PLAYER |
-        COLLISION_CATEGORIES.GROUND
-    );
+    this.matterObj.setCollidesWith(0); // nothing until we have spawn
 
     // workaround to get higher res images
     this.startScale = 0.1;
-    this.matterObj.setScale(this.startScale);
-    this.avatarImage.setScale(this.startScale);
-    this.maskShape.setScale(this.startScale);
-    this.border.setScale(this.startScale);
     this.avatarImage.setMask(this.maskShape.createGeometryMask());
 
-    this.strength = 1;
-    this.fatigue = 0;
-    this.boosting = false;
-    this.chargingBoost = false;
-
     this.keys = scene.input.keyboard.addKeys(controls);
+
+    this.spawn();
 
     if (follow) {
       scene.followObject(this.matterObj);
@@ -280,25 +263,64 @@ export default class PlayerEntity {
     this.powerUps = [];
   }
 
-  die() {
+  spawn() {
+    this.isAlive = true;
+    this.disableController = false;
+    this.strength = 1;
+    this.fatigue = 0;
+    this.boosting = false;
+    this.chargingBoost = false;
+
+    this.matterObj.setScale(this.startScale);
+    this.avatarImage.setScale(this.startScale);
+    this.maskShape.setScale(this.startScale);
+    this.border.setScale(this.startScale);
+
+    this.matterObj.setRotation(0);
+
+    console.log(this.matterObj);
+
+    this.matterObj.setCollisionCategory(COLLISION_CATEGORIES.PLAYER);
+    this.matterObj.setCollidesWith(
+      COLLISION_CATEGORIES.POWER_UP |
+        COLLISION_CATEGORIES.PLAYER |
+        COLLISION_CATEGORIES.GROUND
+    );
+
+    this.matterObj.setPosition(
+      this.scene.game.config.width / 2,
+      this.scene.game.config.height / 2
+    );
+  }
+
+  fall() {
     return new Promise(resolve => {
       this.isAlive = false;
 
       this.scene.tweens.add({
-        targets: [this.matterObj, this.maskShape, this.border],
+        targets: [this.avatarImage, this.maskShape, this.border],
         scale: 0,
-        angle: 240 * (this.matterObj.body.angularVelocity < 0 ? -1 : 1),
         ease: 'linear',
         duration: 1000,
         yoyo: false,
         repeat: 0,
         onComplete: () => {
-          this.scene.stopFollow(this.matterObj);
-          resolve();
+          setTimeout(() => {
+            resolve();
+          }, 1000);
         }
       });
 
-      this.matterObj.setCollisionCategory(0);
+      this.scene.tweens.add({
+        targets: [this.matterObj],
+        angle: 240 * (this.matterObj.body.angularVelocity < 0 ? -1 : 1),
+        ease: 'linear',
+        duration: 1000,
+        yoyo: false,
+        repeat: 0
+      });
+
+      this.matterObj.setCollidesWith(0);
       this.disableController = true;
       this.powerUps.forEach(powerUp => powerUp.tidy());
     });
