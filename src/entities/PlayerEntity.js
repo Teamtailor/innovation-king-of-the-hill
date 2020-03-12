@@ -17,6 +17,11 @@ export default class PlayerEntity {
   growthModifier = 0;
   id = null;
   deaths = 0;
+  collisions = 0;
+  kills = 0;
+  assists = 0;
+  suicides = 0;
+  lastCollidedPlayers = [];
 
   constructor(
     scene,
@@ -45,6 +50,8 @@ export default class PlayerEntity {
     this.matterObj.setCollisionCategory(COLLISION_CATEGORIES.PLAYER);
     this.matterObj.setCollidesWith(0); // nothing until we have spawned
 
+    this.matterObj.setOnCollide(this.onCollideCallback.bind(this));
+
     this.playerAvatar = new PlayerAvatar(scene, image, color);
     this.scene.addPlayerToScoreBoard(this);
 
@@ -54,6 +61,28 @@ export default class PlayerEntity {
 
     if (follow) {
       scene.followObject(this.matterObj);
+    }
+  }
+
+  onCollideCallback({
+    bodyB
+  }) {
+    if (bodyB.collisionFilter.category === COLLISION_CATEGORIES.PLAYER) {
+      // collided with another player
+      const collidedPlayer = this.scene.getPlayerFromBody(bodyB);
+
+      this.lastCollidedPlayers = this.lastCollidedPlayers.filter(
+        ({
+          player
+        }) => player !== collidedPlayer
+      );
+
+      this.lastCollidedPlayers.push({
+        player: collidedPlayer,
+        time: Date.now()
+      });
+
+      collidedPlayer.collisions += 1;
     }
   }
 
@@ -307,7 +336,6 @@ export default class PlayerEntity {
     return new Promise(resolve => {
       this.isAlive = false;
       this.playerAvatar.setDepth(DEPTHS.UNDER_GROUND);
-      this.scene.events.emit('player-dead', this);
 
       this.scene.tweens.add({
         targets: this.playerAvatar.targets,
@@ -319,6 +347,29 @@ export default class PlayerEntity {
         onComplete: () => {
           setTimeout(() => {
             this.deaths += 1;
+
+            const now = Date.now();
+            const assistingPlayers = this.lastCollidedPlayers
+              .filter(({
+                time
+              }) => {
+                return now - time < 4000;
+              })
+              .map(({
+                player
+              }) => player);
+
+            assistingPlayers.forEach(p => {
+              p.assists += 1;
+            });
+
+            const [killingPlayer] = assistingPlayers;
+            if (killingPlayer) {
+              killingPlayer.kills += 1;
+            } else {
+              this.suicides += 1;
+            }
+
             this.scene.updateScoreboard();
             resolve();
           }, 1000);
