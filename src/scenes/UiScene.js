@@ -5,6 +5,9 @@ class UiScene extends BaseScene {
   playerAvatars = [];
   killTexts = [];
   deathTexts = [];
+  assistTexts = [];
+  suicideTexts = [];
+  pointsTexts = [];
   powerUps = [];
 
   constructor() {
@@ -35,12 +38,25 @@ class UiScene extends BaseScene {
       const playerAvatar = this.playerAvatars[i];
       const killText = this.killTexts[i];
       const deathText = this.deathTexts[i];
+      const assistText = this.assistTexts[i];
+      const suicideText = this.suicideTexts[i];
+      const pointsText = this.pointsTexts[i];
 
       playerAvatar.setPosition(x, y);
       killText.setPosition(x + 30, y - 28);
       killText.setText(p.kills);
+
       deathText.setPosition(x + 30, y);
-      deathText.setText(p.deaths);
+      deathText.setText(p.murdered);
+
+      assistText.setPosition(x - 30, y - 28);
+      assistText.setText(p.assists);
+
+      suicideText.setPosition(x - 30, y);
+      suicideText.setText(p.suicides);
+
+      pointsText.setPosition(x, y - 55);
+      pointsText.setText(p.getPoints());
 
       x += distance;
     });
@@ -58,9 +74,19 @@ class UiScene extends BaseScene {
 
     const killText = this.add.text(0, 0, '0', fontStyle);
     const deathText = this.add.text(0, 0, '0', fontStyle);
+    const assistText = this.add.text(0, 0, '0', fontStyle);
+    const suicideText = this.add.text(0, 0, '0', fontStyle);
+    const pointsText = this.add.text(0, 0, '0', fontStyle);
+    assistText.setOrigin(1, 0);
+    suicideText.setOrigin(1, 0);
+    pointsText.setOrigin(0.5, 0);
 
     this.killTexts.push(killText);
     this.deathTexts.push(deathText);
+    this.assistTexts.push(assistText);
+    this.suicideTexts.push(suicideText);
+    this.pointsTexts.push(pointsText);
+
     this.players.push(player);
     this.playerAvatars.push(playerAvatar);
 

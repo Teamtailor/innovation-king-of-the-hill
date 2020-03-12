@@ -17,6 +17,7 @@ export default class PlayerEntity {
   growthModifier = 0;
   id = null;
   deaths = 0;
+  murdered = 0;
   collisions = 0;
   kills = 0;
   assists = 0;
@@ -361,6 +362,7 @@ export default class PlayerEntity {
     const [killingPlayer, assistingPlayer] = assistingPlayers;
 
     if (killingPlayer) {
+      this.murdered += 1;
       killingPlayer.kills += 1;
       const phrases = ['HA!', 'SEE YA!', 'BYE!'];
       const phrase = phrases[Math.floor(Math.random() * phrases.length)];
@@ -380,6 +382,14 @@ export default class PlayerEntity {
     }
 
     this.scene.updateScoreboard();
+  }
+
+  getPoints() {
+    let points = 0;
+    points += this.kills * 2;
+    points += this.assists;
+    points -= this.deaths;
+    return Math.floor(points);
   }
 
   fall() {

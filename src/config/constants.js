@@ -8,7 +8,7 @@ const SCALE = 1;
 // Make it divisible by eight for pixelArt
 export default {
   WIDTH: 1280 * SCALE,
-  HEIGHT: 900 * SCALE,
+  HEIGHT: 950 * SCALE,
   SCALE: SCALE
 };
 
