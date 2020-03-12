@@ -14,16 +14,21 @@ const starBaseSize = 0.1;
 export default class StarBackgroundEntity {
   sprite = null;
   scene = null;
+  stars = [];
 
   constructor({
-    scene
+    scene, data
   }) {
     this.scene = scene;
 
-    this.stars = [];
+    const {
+      images
+    } = data;
+
     for (let i = 0; i < starAmount; i++) {
+      const image = images[Math.floor(Math.random() * images.length)];
       const star = {
-        sprite: this.scene.add.sprite(100, 100, 'pizza'),
+        sprite: this.scene.add.sprite(0, 0, image),
         z: 0,
         x: 0,
         y: 0

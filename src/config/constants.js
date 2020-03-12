@@ -67,3 +67,18 @@ export const POWER_UP_CONFIG = {
     }
   }
 };
+
+export const LEVELS = {
+  crazy: {
+    shape: 'level',
+    background: {
+      type: 'StarBackground',
+      data: {
+        images: ['pizza']
+      }
+    }
+  },
+  pink: {
+    shape: 'pink'
+  }
+};

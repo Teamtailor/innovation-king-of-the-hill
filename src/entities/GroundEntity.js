@@ -9,7 +9,7 @@ export default class GroundEntity {
   scene = null;
 
   constructor({
-    scene, onCollideCallback, onCollideEndCallback
+    scene, onCollideCallback, onCollideEndCallback, level
   }) {
     this.scene = scene;
 
@@ -18,10 +18,10 @@ export default class GroundEntity {
     this.sprite = this.scene.matter.add.sprite(
       scene.game.config.width / 2,
       scene.game.config.height / 2,
-      'level',
+      level.shape,
       null,
       {
-        shape: shapes.level
+        shape: shapes[level.shape]
       }
     );
 

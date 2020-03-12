@@ -23,7 +23,7 @@ class GameScene extends BaseScene {
     this.powerUpService.preload();
   }
 
-  create() {
+  create(level) {
     super.create();
 
     this.scene.launch('UiScene');
@@ -34,14 +34,20 @@ class GameScene extends BaseScene {
 
     escButton.on('down', this.goToMenu.bind(this));
 
-    this.stars = new StarBackgroundEntity({
-      scene: this
-    });
+    if (level.background) {
+      if (level.background.type === 'StarBackground') {
+        this.background = new StarBackgroundEntity({
+          scene: this,
+          data: level.background.data
+        });
+      }
+    }
 
     this.ground = new GroundEntity({
       scene: this,
       onCollideCallback: this.enteringGround.bind(this),
-      onCollideEndCallback: this.leavingGround.bind(this)
+      onCollideEndCallback: this.leavingGround.bind(this),
+      level
     });
 
     this.createPlayers();
@@ -148,34 +154,36 @@ class GameScene extends BaseScene {
     this.players.push(
       new AiPlayerEntity(this, {
         image: 'avatar1',
-        color: 0xFF00FF
+        color: 0xff00ff
       })
     );
 
     this.players.push(
       new AiPlayerEntity(this, {
         image: 'avatar2',
-        color: 0xFF5522
+        color: 0xff5522
       })
     );
 
     this.players.push(
       new AiPlayerEntity(this, {
         image: 'avatar3',
-        color: 0x00FF99
+        color: 0x00ff99
       })
     );
 
     this.players.push(
       new AiPlayerEntity(this, {
         image: 'avatar4',
-        color: 0x5500AA
+        color: 0x5500aa
       })
     );
   }
 
   update(time, delta) {
-    this.stars.update(delta);
+    if (this.background) {
+      this.background.update(delta);
+    }
 
     this.players.forEach(p => {
       p.update(time, delta);

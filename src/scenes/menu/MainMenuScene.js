@@ -1,4 +1,7 @@
 import BaseScene from '../BaseScene';
+import {
+  LEVELS
+} from '../../config/constants';
 
 class MainMenuScene extends BaseScene {
   constructor() {
@@ -23,7 +26,10 @@ class MainMenuScene extends BaseScene {
     super.create();
     const buttons = [];
 
-    this.add.image(-110, -50, 'MenuBackground').setOrigin(0).setScale(1.7);
+    this.add
+      .image(-110, -50, 'MenuBackground')
+      .setOrigin(0)
+      .setScale(1.7);
 
     this.drawActiveUsers();
 
@@ -38,18 +44,26 @@ class MainMenuScene extends BaseScene {
     menuHolderGraphics.fillRectShape(menuHolderRect);
     this.add.graphics(menuHolderGraphics);
 
-    buttons.push(this.add.sprite(400, 270, 'NewGameButton', 0).setInteractive({
-      cursor: 'pointer'
-    }));
-    buttons.push(this.add.sprite(400, 370, 'ResumeGameButton', 0).setInteractive({
-      cursor: 'pointer'
-    }));
-    buttons.push(this.add.sprite(400, 470, 'RulesButton', 0).setInteractive({
-      cursor: 'pointer'
-    }));
-    buttons.push(this.add.sprite(400, 570, 'ScoreboardButton', 0).setInteractive({
-      cursor: 'pointer'
-    }));
+    buttons.push(
+      this.add.sprite(400, 270, 'NewGameButton', 0).setInteractive({
+        cursor: 'pointer'
+      })
+    );
+    buttons.push(
+      this.add.sprite(400, 370, 'ResumeGameButton', 0).setInteractive({
+        cursor: 'pointer'
+      })
+    );
+    buttons.push(
+      this.add.sprite(400, 470, 'RulesButton', 0).setInteractive({
+        cursor: 'pointer'
+      })
+    );
+    buttons.push(
+      this.add.sprite(400, 570, 'ScoreboardButton', 0).setInteractive({
+        cursor: 'pointer'
+      })
+    );
 
     this.resizeElements(buttons, 280, 90);
 
@@ -101,7 +115,7 @@ class MainMenuScene extends BaseScene {
     let printStartPositionY = 400;
     const printStartPositionX = 760;
     const tableSpace = 80;
-    
+
     this.add.text(730, 350, 'Levels', {
       fontFamily: 'Pixeled',
       fontSize: 15,
@@ -139,7 +153,7 @@ class MainMenuScene extends BaseScene {
 
   goToGame() {
     this.clickSound.play();
-    this.scene.start('GameScene');
+    this.scene.start('GameScene', LEVELS.crazy);
   }
 
   goToRules() {
