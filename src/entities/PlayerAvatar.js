@@ -1,5 +1,9 @@
 export default class PlayerAvatar {
   constructor(scene, image, color) {
+    this.scene = scene;
+    this.image = image;
+    this.color = color;
+
     this.maskShape = scene.make
       .graphics()
       .fillCircleShape(new Phaser.Geom.Circle(0, 0, 220));
@@ -18,6 +22,10 @@ export default class PlayerAvatar {
     this.targets = [this.maskShape, this.border, this.avatarImage];
   }
 
+  setTint(color) {
+    this.avatarImage.setTint(color);
+  }
+
   setScale(scale) {
     this.targets.forEach(e => {
       e.setScale(scale);
@@ -34,6 +42,10 @@ export default class PlayerAvatar {
     this.targets.forEach(e => {
       e.setPosition(x, y);
     });
+  }
+
+  clone(newScene) {
+    return new PlayerAvatar(newScene || this.scene, this.image, this.color);
   }
 
   destroy() {

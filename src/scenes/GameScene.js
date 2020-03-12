@@ -26,6 +26,8 @@ class GameScene extends BaseScene {
   create() {
     super.create();
 
+    this.scene.launch('UiScene');
+
     const escButton = this.input.keyboard.addKey('esc');
     this.adjustCamera();
     this.scale.on('resize', this.resize, this);
@@ -44,10 +46,14 @@ class GameScene extends BaseScene {
 
     this.createPlayers();
     this.powerUpService.start();
+  }
 
-    this.uiScene = this.scene.launch('UiScene', {
-      players: this.players
-    });
+  addPlayerToScoreBoard(player) {
+    this.scene.get('UiScene').addPlayerToScoreBoard(player);
+  }
+
+  updateScoreboard() {
+    this.scene.get('UiScene').updateScoreboard();
   }
 
   getRandomGroundPosition() {

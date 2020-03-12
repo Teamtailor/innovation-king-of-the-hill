@@ -16,6 +16,7 @@ export default class PlayerEntity {
   startFriction = 0.2;
   growthModifier = 0;
   id = null;
+  deaths = 0;
 
   constructor(
     scene,
@@ -40,10 +41,12 @@ export default class PlayerEntity {
         radius: 240
       }
     });
+
     this.matterObj.setCollisionCategory(COLLISION_CATEGORIES.PLAYER);
     this.matterObj.setCollidesWith(0); // nothing until we have spawned
 
     this.playerAvatar = new PlayerAvatar(scene, image, color);
+    this.scene.addPlayerToScoreBoard(this);
 
     this.keys = scene.input.keyboard.addKeys(controls);
 
@@ -133,16 +136,36 @@ export default class PlayerEntity {
     const force = new Phaser.Math.Vector2(0, 0);
 
     if (up.isDown) {
-      force.add(new Phaser.Math.Vector2(0.0, this.applySpeedModifiers(-GAME_CONFIG.DEFAULT_SPEED)));
+      force.add(
+        new Phaser.Math.Vector2(
+          0.0,
+          this.applySpeedModifiers(-GAME_CONFIG.DEFAULT_SPEED)
+        )
+      );
     }
     if (down.isDown) {
-      force.add(new Phaser.Math.Vector2(0.0, this.applySpeedModifiers(GAME_CONFIG.DEFAULT_SPEED)));
+      force.add(
+        new Phaser.Math.Vector2(
+          0.0,
+          this.applySpeedModifiers(GAME_CONFIG.DEFAULT_SPEED)
+        )
+      );
     }
     if (left.isDown) {
-      force.add(new Phaser.Math.Vector2(this.applySpeedModifiers(-GAME_CONFIG.DEFAULT_SPEED), 0));
+      force.add(
+        new Phaser.Math.Vector2(
+          this.applySpeedModifiers(-GAME_CONFIG.DEFAULT_SPEED),
+          0
+        )
+      );
     }
     if (right.isDown) {
-      force.add(new Phaser.Math.Vector2(this.applySpeedModifiers(GAME_CONFIG.DEFAULT_SPEED), 0));
+      force.add(
+        new Phaser.Math.Vector2(
+          this.applySpeedModifiers(GAME_CONFIG.DEFAULT_SPEED),
+          0
+        )
+      );
     }
 
     this.matterObj.applyForce(force);
@@ -292,6 +315,8 @@ export default class PlayerEntity {
         repeat: 0,
         onComplete: () => {
           setTimeout(() => {
+            this.deaths += 1;
+            this.scene.updateScoreboard();
             resolve();
           }, 1000);
         }

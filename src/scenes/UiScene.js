@@ -1,6 +1,10 @@
 import BaseScene from './BaseScene';
 
 class UiScene extends BaseScene {
+  players = [];
+  playerAvatars = [];
+  deathTexts = [];
+
   constructor() {
     super({
       key: 'UiScene'
@@ -11,20 +15,43 @@ class UiScene extends BaseScene {
 
   create() {
     super.create();
-    this.createInstructions();
+    this.updateScoreboard();
   }
 
-  createInstructions() {
-    this.add.text(
-      10,
-      10,
-      'Controls:\nPush: Arrows & Space\nTank: WASD & R\nMouse: Click & B\nGo to menu: Esc',
-      {
-        fontFamily: 'Pixeled',
-        fontSize: 12,
-        color: '#00ff00'
-      }
-    );
+  updateScoreboard() {
+    const distance = 150;
+    let x =
+      this.game.config.width / 2 -
+      ((this.playerAvatars.length - 1) / 2) * distance;
+    const y = this.game.config.height;
+
+    this.players.forEach((p, i) => {
+      const playerAvatar = this.playerAvatars[i];
+      const deathText = this.deathTexts[i];
+
+      playerAvatar.setPosition(x, y);
+      deathText.setPosition(x + 30, y);
+      deathText.setText(p.deaths);
+
+      x += distance;
+    });
+  }
+
+  addPlayerToScoreBoard(player) {
+    const playerAvatar = player.playerAvatar.clone(this);
+    playerAvatar.setScale(0.1);
+
+    const deathText = this.add.text(0, 0, '0', {
+      fontFamily: 'Pixeled',
+      fontSize: 12,
+      color: '#ffffff'
+    });
+
+    this.deathTexts.push(deathText);
+    this.players.push(player);
+    this.playerAvatars.push(playerAvatar);
+
+    this.updateScoreboard();
   }
 
   update(time, delta) {}
