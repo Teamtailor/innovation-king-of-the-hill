@@ -77,7 +77,6 @@ class UiScene extends BaseScene {
       pointsText.setText(allPoints[i]);
 
       if (p.leader) {
-        console.log(x, this.crown, p.leader);
         this.crown.setPosition(x + 8, y - 28);
       }
 
