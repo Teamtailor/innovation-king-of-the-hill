@@ -307,6 +307,7 @@ export default class PlayerEntity {
     return new Promise(resolve => {
       this.isAlive = false;
       this.playerAvatar.setDepth(DEPTHS.UNDER_GROUND);
+      this.scene.events.emit('player-dead', this);
 
       this.scene.tweens.add({
         targets: this.playerAvatar.targets,

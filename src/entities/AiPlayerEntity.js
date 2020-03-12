@@ -11,6 +11,11 @@ export default class AiPlayerEntity extends PlayerEntity {
   target = null;
   lastTargetTime = 0;
 
+  constructor(scene, config) {
+    super(scene, config);
+    this.scene.events.on('player-dead', this.handlePlayerDead, this);
+  }
+
   update(time, delta) {
     super.update(time, delta);
     if (this.isAlive) {
@@ -51,14 +56,19 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   move() {
-    if (!this.target) {
-      return;
-    }
-
     const force = new Phaser.Math.Vector2(0, 0);
+
+    const gotoPosition = this.target ? this.target.getPosition() : this.scene.ground.sprite;
+
     const {
       velX, velY
-    } = this.velocityToTarget(this.getPosition(), this.target.getPosition(), GAME_CONFIG.DEFAULT_SPEED);
+    } = this.velocityToTarget(
+      this.getPosition(),
+      gotoPosition,
+      this.target
+        ? GAME_CONFIG.DEFAULT_SPEED
+        : GAME_CONFIG.DEFAULT_SPEED * 0.25
+    );
 
     const vector = new Phaser.Math.Vector2(this.applySpeedModifiers(velX), this.applySpeedModifiers(velY));
     force.add(vector);
@@ -104,5 +114,12 @@ export default class AiPlayerEntity extends PlayerEntity {
       velX: speed * Math.sin(direction),
       velY: speed * Math.cos(direction)
     };
+  }
+
+  handlePlayerDead(player) {
+    if (this.target && this.target.id === player.id) {
+      console.log('AI players target died', this.id, this.target.id);
+      this.target = null;
+    }
   }
 }
