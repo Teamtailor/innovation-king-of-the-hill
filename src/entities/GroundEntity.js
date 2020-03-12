@@ -1,5 +1,5 @@
 import {
-  COLLISION_CATEGORIES
+  COLLISION_CATEGORIES, DEPTHS
 } from '../config/constants';
 
 const GROUND_POSITION_MARGIN = 30;
@@ -25,6 +25,8 @@ export default class GroundEntity {
       }
     );
 
+    this.sprite.setDepth(DEPTHS.GROUND);
+
     // this needed to be done because of a bug when importing shape from PhysicsEditor (cant set regular callback)
     this.scene.matter.world.on('collisionstart', function(event) {
       for (var i = 0; i < event.pairs.length; i++) {
@@ -47,7 +49,9 @@ export default class GroundEntity {
     });
 
     this.sprite.setCollisionCategory(COLLISION_CATEGORIES.GROUND);
-    this.sprite.setCollidesWith(COLLISION_CATEGORIES.POWER_UP | COLLISION_CATEGORIES.PLAYER);
+    this.sprite.setCollidesWith(
+      COLLISION_CATEGORIES.POWER_UP | COLLISION_CATEGORIES.PLAYER
+    );
   }
 
   pointIsOnGround(x, y) {

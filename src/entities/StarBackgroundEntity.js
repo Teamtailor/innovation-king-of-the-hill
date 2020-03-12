@@ -1,3 +1,7 @@
+import {
+  DEPTHS
+} from '../config/constants';
+
 const starAmount = 1000;
 let cameraZ = 0;
 const fov = 20;
@@ -25,6 +29,7 @@ export default class StarBackgroundEntity {
         y: 0
       };
       star.sprite.setOrigin(0.5, 0.7);
+      star.sprite.setDepth(DEPTHS.BACKGROUND);
       this.randomizeStar(star, true);
       this.stars.push(star);
     }

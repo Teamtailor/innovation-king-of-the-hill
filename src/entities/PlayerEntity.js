@@ -1,5 +1,5 @@
 import {
-  COLLISION_CATEGORIES, GAME_CONFIG
+  COLLISION_CATEGORIES, GAME_CONFIG, DEPTHS
 } from '../config/constants';
 import PlayerAvatar from './PlayerAvatar';
 
@@ -297,6 +297,7 @@ export default class PlayerEntity {
 
     this.matterObj.setScale(this.startScale);
     this.playerAvatar.setScale(this.startScale);
+    this.playerAvatar.setDepth(DEPTHS.ABOVE_GROUND);
 
     const groundPosition = this.scene.getRandomGroundPosition();
     this.matterObj.setPosition(groundPosition.x, groundPosition.y);
@@ -305,6 +306,7 @@ export default class PlayerEntity {
   fall() {
     return new Promise(resolve => {
       this.isAlive = false;
+      this.playerAvatar.setDepth(DEPTHS.UNDER_GROUND);
 
       this.scene.tweens.add({
         targets: this.playerAvatar.targets,

@@ -24,6 +24,14 @@ export const COLLISION_CATEGORIES = {
   POWER_UP: 0x08
 };
 
+export const DEPTHS = {
+  BACKGROUND: 0,
+  UNDER_GROUND: 1,
+  GROUND: 2,
+  ABOVE_GROUND: 3,
+  AIR: 4
+};
+
 export const POWER_UP_CONFIG = {
   MIN_SPAWN_TIME: 1500,
   MAX_SPAWN_TIME: 3500,

@@ -1,5 +1,7 @@
 import {
-  COLLISION_CATEGORIES, POWER_UP_CONFIG
+  COLLISION_CATEGORIES,
+  POWER_UP_CONFIG,
+  DEPTHS
 } from '../../config/constants';
 
 export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
@@ -15,7 +17,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   isConsumed = false;
   label = null;
 
-  constructor (scene, x, y, texture) {
+  constructor(scene, x, y, texture) {
     super(scene.matter.world, x, y, texture);
     this.id = scene.generateId();
     this.scene = scene;
@@ -24,11 +26,14 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
 
   init() {
     this.setCollisionCategory(COLLISION_CATEGORIES.POWER_UP);
-    this.setCollidesWith(COLLISION_CATEGORIES.PLAYER | COLLISION_CATEGORIES.GROUND);
+    this.setCollidesWith(
+      COLLISION_CATEGORIES.PLAYER | COLLISION_CATEGORIES.GROUND
+    );
     this.setOnCollide(this.handleCollision.bind(this));
     this.setRandomRotation();
     this.setLabel();
     this.setSensor(true);
+    this.setDepth(DEPTHS.ABOVE_GROUND);
     this.scene.add.existing(this);
     this.addRemoveTimerEvent();
     return this;
@@ -37,7 +42,9 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   applyConfig() {
     const {
       label, duration, svgScale
-    } = POWER_UP_CONFIG.TYPES[this.constructor.name];
+    } = POWER_UP_CONFIG.TYPES[
+      this.constructor.name
+    ];
 
     this.label = label;
     this.effectLifeTime = duration;
@@ -83,7 +90,8 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
     this.isConsumed = true;
 
     console.log('Consuming power up', {
-      player, powerUp: this
+      player,
+      powerUp: this
     });
 
     this.tidyIdleTasks();
@@ -126,7 +134,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
       color: '#ffbe00'
     });
     label.setOrigin(0.5);
-    label.setDepth(1);
+    label.setDepth(DEPTHS.AIR);
 
     scene.tweens.add({
       targets: [label],
@@ -160,7 +168,8 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
       targets: [this],
       scale: 2,
       alpha: {
-        from: 1, to: 0
+        from: 1,
+        to: 0
       },
       angle: Phaser.Math.Between(0, 180),
       ease: 'Cubic',
@@ -233,7 +242,8 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
     this.onDetachFromPlayer(player);
 
     console.log('Power up worn out', {
-      player, powerUp: this
+      player,
+      powerUp: this
     });
   }
 

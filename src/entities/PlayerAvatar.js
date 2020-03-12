@@ -22,6 +22,12 @@ export default class PlayerAvatar {
     this.targets = [this.maskShape, this.border, this.avatarImage];
   }
 
+  setDepth(depth) {
+    this.targets.forEach(e => {
+      e.setDepth(depth);
+    });
+  }
+
   setTint(color) {
     this.avatarImage.setTint(color);
   }
