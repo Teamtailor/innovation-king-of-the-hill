@@ -8,6 +8,8 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   idleTimerEvent = null;
   effectLifeTime = 0;
   idleLifetime = 3000;
+  removeAnimation = null;
+  consumingAnimation = null;
   id = null;
   isDestroyed = false;
   isConsumed = false;
@@ -55,12 +57,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
       return;
     }
     console.log('Start idle animation', this);
-
-    this.animateTooLongIdle(() => {
-      console.log('Start idle animation complete', this);
-      this.isDestroyed = true;
-      this.destroy();
-    });
+    this.removeAnimation = this.animateRemove();
   }
 
   setRandomRotation() {
@@ -77,7 +74,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
 
   consume(playerBody) {
     const player = this.scene.getPlayerFromBody(playerBody);
-    if (!player.isAlive) {
+    if (!player.isAlive || this.isDestroyed) {
       return;
     }
 
@@ -89,26 +86,31 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
       player, powerUp: this
     });
 
-    if (this.idleTimerEvent) {
-      this.idleTimerEvent.destroy();
-    }
-
+    this.tidyIdleTasks();
     this.addTextAnimation(this, this.label);
-    this.animateConsumation(() => {
-      console.log('Power up animation complete', this);
-      this.destroy();
-    });
+    this.consumingAnimation = this.animateConsumation();
   }
 
   tidy() {
+    if (this.effectWornOutTimerEvent) {
+      this.effectWornOutTimerEvent.destroy();
+      this.effectWornOutTimerEvent = null;
+    }
+    this.tidyIdleTasks();
+  }
+
+  tidyIdleTasks() {
     if (this.idleTimerEvent) {
       this.idleTimerEvent.destroy();
       this.idleTimerEvent = null;
     }
+    if (this.removeAnimation) {
+      if (this.removeAnimation.isPlaying()) {
+        this.removeAnimation.stop();
+      }
 
-    if (this.effectWornOutTimerEvent) {
-      this.effectWornOutTimerEvent.destroy();
-      this.effectWornOutTimerEvent = null;
+      this.removeAnimation.remove();
+      this.removeAnimation = null;
     }
   }
 
@@ -118,7 +120,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
     if (!text) {
       return;
     }
-    const label = scene.add.text(x, y, text, {
+    let label = scene.add.text(x, y, text, {
       fontFamily: 'Pixeled',
       fontSize: 14,
       color: '#ffbe00'
@@ -143,12 +145,18 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
       },
       onComplete: () => {
         label.destroy();
+        label = null;
       }
     });
   }
 
-  animateConsumation(onComplete) {
-    this.scene.tweens.add({
+  onAnimateConsumationComplete() {
+    console.log('Power up animation complete', this);
+    this.destroy();
+  }
+
+  animateConsumation() {
+    return this.scene.tweens.add({
       targets: [this],
       scale: 2,
       alpha: {
@@ -159,19 +167,37 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
       duration: 250,
       yoyo: false,
       repeat: 0,
-      onComplete: onComplete
+      onComplete: this.onAnimateConsumationComplete.bind(this)
     });
   }
 
-  animateTooLongIdle(onComplete) {
-    this.scene.tweens.add({
+  onAnimateRemoveComplete() {
+    console.log('Idle animation complete', this);
+    if (this.consumingAnimation && this.consumingAnimation.isPlaying()) {
+      return;
+    }
+    this.destroy();
+  }
+
+  onAnimateRemoveUpdate({
+    progress
+  }) {
+    if (!this.isDestroyed && progress > 0.7) {
+      this.isDestroyed = true;
+      this.setCollisionCategory(COLLISION_CATEGORIES.NONE);
+    }
+  }
+
+  animateRemove() {
+    return this.scene.tweens.add({
       targets: [this],
       scale: 0,
       ease: 'Cubic',
       duration: 350,
       yoyo: false,
       repeat: 0,
-      onComplete: onComplete
+      onComplete: this.onAnimateRemoveComplete.bind(this),
+      onUpdate: this.onAnimateRemoveUpdate.bind(this)
     });
   }
 
