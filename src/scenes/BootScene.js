@@ -55,6 +55,7 @@ class BootScene extends Phaser.Scene {
 
     this.load.image('transparent', 'assets/images/transparent.png');
     this.load.image('star', 'assets/images/star.png');
+    this.load.svg('crown', 'assets/svg/crown.svg');
 
     this.load.json('shapes', 'assets/shapes.json');
     this.load.image('level', 'assets/level.png');

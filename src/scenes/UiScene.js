@@ -20,19 +20,37 @@ class UiScene extends BaseScene {
 
   create() {
     super.create();
+    this.crown = this.add.image(0, 0, 'crown');
+    this.crown.setScale(0.2);
+    this.crown.setRotation((18 * Math.PI) / 180);
+    this.created = true;
     this.updateScoreboard();
   }
 
   updateScoreboard() {
+    if (!this.created) {
+      return;
+    }
+
     const distance = 150;
     let x =
       this.game.config.width / 2 -
       ((this.playerAvatars.length - 1) / 2) * distance;
-    const y = this.game.config.height - 50;
+    const y = this.game.config.height - 70;
 
-    this.powerUps.forEach(pU => {
-      pU.destroy();
+    this.powerUps.forEach(pu => {
+      pu.destroy();
     });
+
+    const [currentLeader] = this.players.filter(p => p.leader);
+    const allPoints = this.players.map(p => p.points);
+    const highestPoints = Math.max(...allPoints);
+    if (!currentLeader || currentLeader.points !== highestPoints) {
+      if (currentLeader) {
+        currentLeader.leader = false;
+      }
+      this.players[allPoints.indexOf(highestPoints)].leader = true;
+    }
 
     this.players.forEach((p, i) => {
       const playerAvatar = this.playerAvatars[i];
@@ -55,8 +73,13 @@ class UiScene extends BaseScene {
       suicideText.setPosition(x - 30, y);
       suicideText.setText(p.suicides);
 
-      pointsText.setPosition(x, y - 55);
-      pointsText.setText(p.getPoints());
+      pointsText.setPosition(x, y + 50);
+      pointsText.setText(allPoints[i]);
+
+      if (p.leader) {
+        console.log(x, this.crown, p.leader);
+        this.crown.setPosition(x + 8, y - 28);
+      }
 
       x += distance;
     });
@@ -79,7 +102,7 @@ class UiScene extends BaseScene {
     const pointsText = this.add.text(0, 0, '0', fontStyle);
     assistText.setOrigin(1, 0);
     suicideText.setOrigin(1, 0);
-    pointsText.setOrigin(0.5, 0);
+    pointsText.setOrigin(0.5, 1);
 
     this.killTexts.push(killText);
     this.deathTexts.push(deathText);

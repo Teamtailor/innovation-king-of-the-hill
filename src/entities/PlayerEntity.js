@@ -22,6 +22,7 @@ export default class PlayerEntity {
   kills = 0;
   assists = 0;
   suicides = 0;
+  points = 0;
   lastCollidedPlayers = [];
 
   constructor(
@@ -367,11 +368,15 @@ export default class PlayerEntity {
       const phrases = ['HA!', 'SEE YA!', 'BYE!'];
       const phrase = phrases[Math.floor(Math.random() * phrases.length)];
       this.scene.addTextAnimation(killingPlayer.matterObj, phrase);
+
+      killingPlayer.updatePoints();
     }
 
     if (assistingPlayer) {
       assistingPlayer.assists += 1;
       this.scene.addTextAnimation(assistingPlayer.matterObj, 'ASSIST');
+
+      assistingPlayer.updatePoints();
     }
 
     if (!killingPlayer) {
@@ -381,20 +386,23 @@ export default class PlayerEntity {
       this.scene.addTextAnimation(this.matterObj, phrase);
     }
 
+    this.updatePoints();
+
     this.scene.updateScoreboard();
   }
 
-  getPoints() {
+  updatePoints() {
     let points = 0;
     points += this.kills * 2;
     points += this.assists;
     points -= this.deaths;
-    return Math.floor(points);
+    this.points = Math.floor(points);
   }
 
   fall() {
     return new Promise(resolve => {
       this.updateDeathScores();
+
       this.isAlive = false;
       this.playerAvatar.setDepth(DEPTHS.UNDER_GROUND);
 
