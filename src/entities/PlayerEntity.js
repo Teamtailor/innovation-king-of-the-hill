@@ -35,10 +35,12 @@ export default class PlayerEntity {
       })
       .fillCircleShape(new Phaser.Geom.Circle(0, 0, 240));
 
+    this.avatarImage = scene.add.image(0, 0, image);
+
     this.matterObj = scene.matter.add.image(
       scene.game.config.width / 2,
       scene.game.config.height / 2,
-      image,
+      null,
       null,
       {
         label: 'player-' + image,
@@ -57,13 +59,14 @@ export default class PlayerEntity {
         COLLISION_CATEGORIES.PLAYER |
         COLLISION_CATEGORIES.GROUND
     );
-    this.matterObj.setMask(this.maskShape.createGeometryMask());
 
     // workaround to get higher res images
     this.startScale = 0.1;
     this.matterObj.setScale(this.startScale);
+    this.avatarImage.setScale(this.startScale);
     this.maskShape.setScale(this.startScale);
     this.border.setScale(this.startScale);
+    this.avatarImage.setMask(this.maskShape.createGeometryMask());
 
     this.strength = 1;
     this.fatigue = 0;
@@ -192,7 +195,7 @@ export default class PlayerEntity {
       this.boosting = true;
 
       this.scene.tweens.add({
-        targets: [this.matterObj, this.maskShape, this.border],
+        targets: [this.avatarImage, this.maskShape, this.border],
         scale: (this.startScale + this.startScale * this.growthModifier) * 1.4,
         ease: 'linear',
         duration: 100,
@@ -200,9 +203,13 @@ export default class PlayerEntity {
         repeat: 0,
         onComplete: () => {
           this.boosting = false;
-          this.matterObj.setScale(
-            this.startScale + this.startScale * this.growthModifier
-          );
+
+          const newScale =
+            this.startScale + this.startScale * this.growthModifier;
+
+          [this.avatarImage, this.maskShape, this.border].forEach(e => {
+            e.setScale(newScale);
+          });
         }
       });
 
@@ -235,7 +242,12 @@ export default class PlayerEntity {
   }
 
   applySpeedModifiers(value) {
-    return value * this.availableStrength * this.speedModifier * (this.reverseControls ? -1 : 1);
+    return (
+      value *
+      this.availableStrength *
+      this.speedModifier *
+      (this.reverseControls ? -1 : 1)
+    );
   }
 
   finishBoosting() {
@@ -254,6 +266,8 @@ export default class PlayerEntity {
   }
 
   updateMask() {
+    this.avatarImage.setRotation(this.matterObj.rotation);
+    this.avatarImage.setPosition(this.matterObj.x, this.matterObj.y);
     this.border.setPosition(this.matterObj.x, this.matterObj.y);
     this.maskShape.setPosition(this.matterObj.x, this.matterObj.y);
   }
@@ -341,6 +355,7 @@ export default class PlayerEntity {
     const newScale = this.startScale + this.startScale * this.growthModifier;
 
     this.matterObj.setDensity(body.density + densityModifier * sign);
+    this.avatarImage.setScale(newScale);
     this.maskShape.setScale(newScale);
     this.matterObj.setScale(newScale);
     this.border.setScale(newScale);
