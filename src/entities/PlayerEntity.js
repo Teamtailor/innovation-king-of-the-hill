@@ -5,6 +5,7 @@ import {
 export default class PlayerEntity {
   powerUps = [];
   speedModifier = 1;
+  isAlive = true;
 
   constructor(
     scene,
@@ -234,7 +235,7 @@ export default class PlayerEntity {
   }
 
   applySpeedModifiers(value) {
-    return value * this.availableStrength * this.speedModifier;
+    return value * this.availableStrength * this.speedModifier * (this.reverseControls ? -1 : 1);
   }
 
   finishBoosting() {
@@ -267,7 +268,7 @@ export default class PlayerEntity {
 
   die() {
     return new Promise(resolve => {
-      this.dying = true;
+      this.isAlive = false;
 
       this.scene.tweens.add({
         targets: [this.matterObj, this.maskShape, this.border],
@@ -284,8 +285,8 @@ export default class PlayerEntity {
       });
 
       this.matterObj.setCollisionCategory(0);
-
       this.disableController = true;
+      this.powerUps.forEach(powerUp => powerUp.tidy());
     });
   }
 
@@ -366,5 +367,9 @@ export default class PlayerEntity {
       friction
     } = this.matterObj.body;
     this.matterObj.setFrictionAir(friction + slipAmount);
+  }
+
+  setReversedControls(value) {
+    this.reverseControls = value;
   }
 }

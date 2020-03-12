@@ -77,6 +77,9 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
 
   consume(playerBody) {
     const player = this.scene.getPlayerFromBody(playerBody);
+    if (!player.isAlive) {
+      return;
+    }
 
     this.setCollisionCategory(COLLISION_CATEGORIES.NONE);
     this.attachToPlayer(player);
@@ -90,18 +93,32 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
       this.idleTimerEvent.destroy();
     }
 
-    this.addTextAnimation();
+    this.addTextAnimation(this, this.label);
     this.animateConsumation(() => {
       console.log('Power up animation complete', this);
       this.destroy();
     });
   }
 
-  addTextAnimation() {
-    if (this.label === null) {
+  tidy() {
+    if (this.idleTimerEvent) {
+      this.idleTimerEvent.destroy();
+      this.idleTimerEvent = null;
+    }
+
+    if (this.effectWornOutTimerEvent) {
+      this.effectWornOutTimerEvent.destroy();
+      this.effectWornOutTimerEvent = null;
+    }
+  }
+
+  addTextAnimation({
+    scene, x, y
+  }, text) {
+    if (!text) {
       return;
     }
-    const label = this.scene.add.text(this.x, this.y, this.label, {
+    const label = scene.add.text(x, y, text, {
       fontFamily: 'Pixeled',
       fontSize: 14,
       color: '#ffbe00'
@@ -109,7 +126,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
     label.setOrigin(0.5);
     label.setDepth(1);
 
-    this.scene.tweens.add({
+    scene.tweens.add({
       targets: [label],
       scale: 2.8,
       angle: Math.random() > 0.5 ? 50 : -50,
@@ -182,6 +199,10 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   }
 
   detachFromPlayer(player) {
+    if (!player.isAlive) {
+      return;
+    }
+
     player.removePowerUp(this);
     this.onDetachFromPlayer(player);
 

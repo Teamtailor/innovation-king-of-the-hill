@@ -38,6 +38,12 @@ export const POWER_UP_CONFIG = {
       duration: 2500,
       svgScale: 0.08,
       svgAsset: 'soda-can'
+    },
+    Drunk: {
+      label: 'FEELING DIZZY',
+      duration: 3000,
+      svgScale: 0.18,
+      svgAsset: 'cocktail'
     }
   }
 };

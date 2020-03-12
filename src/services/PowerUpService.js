@@ -1,6 +1,8 @@
 import Grow from '../entities/power-ups/Grow';
 import SpeedUp from '../entities/power-ups/SpeedUp';
 import Slip from '../entities/power-ups/Slip';
+import Drunk from '../entities/power-ups/Drunk';
+
 import {
   POWER_UP_CONFIG
 } from '../config/constants';
@@ -8,7 +10,8 @@ import {
 const POWER_UP_CLASSES = [
   Grow,
   SpeedUp,
-  Slip
+  Slip,
+  Drunk
 ];
 
 export default class PowerUpService {
