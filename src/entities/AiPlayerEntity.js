@@ -1,7 +1,8 @@
 import PlayerEntity from './PlayerEntity';
-
+import MathUtils from '../utils/Math';
 import {
-  GAME_CONFIG
+  GAME_CONFIG,
+  COLLISION_CATEGORIES
 } from '../config/constants';
 
 const {
@@ -13,7 +14,9 @@ const {
   BOOST_THRESHOLD,
   BOOST_DELAY_RANDOMNESS,
   BOOST_DIRECTION_MIN,
-  BOOST_DIRECTION_MAX
+  BOOST_DIRECTION_MAX,
+  DEFAULT_REACTION_TIME,
+  REACTION_SPEED_RANDOMNESS
 } = GAME_CONFIG.AI;
 
 export default class AiPlayerEntity extends PlayerEntity {
@@ -25,6 +28,9 @@ export default class AiPlayerEntity extends PlayerEntity {
   performBoost = false;
   lastBoostTime = 0;
   performBoostAt = null;
+  lastMoveVector = null;
+  shouldUpdateReactionTimeAt = 0;
+  currentReactionTime = DEFAULT_REACTION_TIME;
 
   constructor(scene, config) {
     super(scene, config);
@@ -37,14 +43,37 @@ export default class AiPlayerEntity extends PlayerEntity {
     super.update(time, delta);
     if (this.isAlive) {
       this.updateTarget(time);
-      this.move();
+      this.updateReactionTime(time);
+      this.move(time);
     }
+  }
+
+  updateReactionTime(time) {
+    if (time < this.shouldUpdateReactionTimeAt || !this.hasMovingTarget()) {
+      return;
+    }
+
+    this.shouldUpdateReactionTimeAt = time + Phaser.Math.Between(350, 750);
+
+    let reactionTime = MathUtils.RandomSign(
+      Math.random() * REACTION_SPEED_RANDOMNESS * DEFAULT_REACTION_TIME
+    );
+    reactionTime += DEFAULT_REACTION_TIME;
+
+    const distanceToTarget = this.getDistanceToPoint(this.target.getPosition());
+    if (distanceToTarget < 250) {
+      reactionTime = reactionTime * (distanceToTarget / 250);
+    }
+
+    this.currentReactionTime = Phaser.Math.RoundTo(reactionTime);
   }
 
   spawn() {
     super.spawn();
     this.target = null;
     this.lastCollision = null;
+    this.currentReactionTime = DEFAULT_REACTION_TIME;
+    this.shouldUpdateReactionTimeAt = 0;
   }
 
   updateTarget(time) {
@@ -60,6 +89,7 @@ export default class AiPlayerEntity extends PlayerEntity {
       this.target = target;
       this.lastTargetUpdateTime = time;
       this.currentTargetAttentionTime = Phaser.Math.Between(TARGET_TIREDNESS_TIME_MIN, TARGET_TIREDNESS_TIME_MAX);
+      this.shouldUpdateReactionTimeAt = 0;
     }
   }
 
@@ -72,14 +102,22 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   hasReachedIdlePosition() {
-    return Phaser.Math.Distance.BetweenPoints(this.getPosition(), this.scene.ground.sprite) < 50;
+    return this.getDistanceToPoint(this.scene.ground.sprite) < 50;
   }
 
   hasTarget() {
     return this.target && this.target.hasPosition();
   }
 
-  move() {
+  hasMovingTarget() {
+    return this.hasTarget() && this.isTargetPlayer();
+  }
+
+  isTargetPlayer() {
+    return this.target.type === COLLISION_CATEGORIES.PLAYER;
+  }
+
+  move(time) {
     const force = new Phaser.Math.Vector2(0, 0);
 
     if (!this.hasTarget() && this.hasReachedIdlePosition()) {
@@ -88,15 +126,20 @@ export default class AiPlayerEntity extends PlayerEntity {
       return;
     }
 
-    const gotoPosition = this.hasTarget()
-      ? this.target.getPosition()
-      : this.scene.ground.sprite;
+    let pointOfInterest = null;
+    if (this.hasTarget()) {
+      pointOfInterest = this.isTargetPlayer()
+        ? this.target.getPreviousPosition(this.currentReactionTime)
+        : this.target.getPosition();
+    } else {
+      pointOfInterest = this.scene.ground.sprite;
+    }
 
     const {
       velX, velY
     } = this.velocityToTarget(
       this.getPosition(),
-      gotoPosition,
+      pointOfInterest,
       this.getSpeed()
     );
 
@@ -104,20 +147,20 @@ export default class AiPlayerEntity extends PlayerEntity {
     force.add(vector);
     this.matterObj.applyForce(force);
 
-    if (this.shouldPerformBoost()) {
-      const direction = Phaser.Math.Between(BOOST_DIRECTION_MIN, BOOST_DIRECTION_MAX) * Math.random() < 0.5 ? 1 : -1;
+    if (this.shouldPerformBoost(time)) {
+      const direction = MathUtils.RandomSign(Phaser.Math.Between(BOOST_DIRECTION_MIN, BOOST_DIRECTION_MAX));
       this.boostUp();
       this.applyBoost(force, direction);
       this.performBoostAt = null;
-      this.lastBoostTime = this.scene.time.now;
+      this.lastBoostTime = time;
       this.matterObj.setAngularVelocity(Math.random() * 40 - 20);
     }
   }
 
-  shouldPerformBoost() {
+  shouldPerformBoost(time) {
     return (this.performBoostAt &&
-      this.performBoostAt < this.scene.time.now &&
-      this.scene.time.now > this.lastBoostTime + BOOST_THRESHOLD);
+      this.performBoostAt < time &&
+      time > this.lastBoostTime + BOOST_THRESHOLD);
   }
 
   getSpeed() {
@@ -159,7 +202,7 @@ export default class AiPlayerEntity extends PlayerEntity {
     let closestTargetPosition = Phaser.Math.MAX_SAFE_INTEGER;
     let closestTarget = null;
     possibleTargets.forEach(target => {
-      const distance = Phaser.Math.Distance.BetweenPoints(this.getPosition(), target.getPosition());
+      const distance = this.getDistanceToPoint(target.getPosition());
       if (distance < closestTargetPosition) {
         closestTargetPosition = distance;
         closestTarget = target;

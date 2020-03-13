@@ -6,5 +6,8 @@ export default {
       sum += value;
       return sum;
     })(0)).filter((el) => rand > el).length;
+  },
+  RandomSign: (value) => {
+    return value * (Math.random() < 0.5 ? -1 : 1);
   }
 };

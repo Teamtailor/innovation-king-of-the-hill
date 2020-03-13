@@ -14,6 +14,7 @@ export default {
 
 export const GAME_CONFIG = {
   DEFAULT_SPEED: 0.05,
+  PLAYER_POSITION_HISTORY: 50,
   AI: {
     DEFAULT_SPEED: 0.0486,
     SPEED_RANDOMNESS: 0.00145,
@@ -23,7 +24,9 @@ export const GAME_CONFIG = {
     BOOST_THRESHOLD: 1000,
     BOOST_DELAY_RANDOMNESS: 0.3,
     BOOST_DIRECTION_MIN: 65, // degrees
-    BOOST_DIRECTION_MAX: 140 // degrees
+    BOOST_DIRECTION_MAX: 140, // degrees
+    DEFAULT_REACTION_TIME: 14, // update runloops
+    REACTION_SPEED_RANDOMNESS: 0.5
   }
 };
 

@@ -38,6 +38,10 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
     return this;
   }
 
+  get type() {
+    return this.body ? this.body.collisionFilter.category : undefined;
+  }
+
   get isActive() {
     return !this.shouldDestroy && !this.isConsumed && this.body;
   }

@@ -24,6 +24,15 @@ export default class PlayerEntity {
   suicides = 0;
   points = 0;
   lastCollidedPlayers = [];
+  previousPositions = [];
+
+  edgeSensor = null;
+  edgeSensorConstraint = null;
+  edgeSensorGrounds = 0;
+
+  jumpSensor = null;
+  jumpSensorConstraint = null;
+  jumpSensorGrounds = 0;
 
   constructor(
     scene,
@@ -69,14 +78,6 @@ export default class PlayerEntity {
       scene.followObject(this.matterObj);
     }
   }
-
-  edgeSensor = null;
-  edgeSensorConstraint = null;
-  edgeSensorGrounds = 0;
-
-  jumpSensor = null;
-  jumpSensorConstraint = null;
-  jumpSensorGrounds = 0;
 
   createEdgeSensor() {
     this.edgeSensor = this.scene.matter.add.circle(0, 0, 10, {
@@ -138,6 +139,10 @@ export default class PlayerEntity {
       this.createEdgeSensor();
       this.createJumpSensor();
     }
+  }
+
+  get type() {
+    return this.matterObj.body.collisionFilter.category;
   }
 
   get isActive() {
@@ -371,6 +376,7 @@ export default class PlayerEntity {
     this.reverseControls = false;
     this.speedModifier = 1;
     this.growthModifier = 0;
+    this.previousPositions = [];
 
     this.powerUps.forEach(powerUp => powerUp.destroy());
     this.powerUps = [];
@@ -544,6 +550,14 @@ export default class PlayerEntity {
     this.readBoost();
     const force = this.readController(delta);
     this.applyBoost(force);
+    this.updatePreviousPositions();
+  }
+
+  updatePreviousPositions() {
+    this.previousPositions.unshift(this.getPosition());
+    if (this.previousPositions.length > GAME_CONFIG.PLAYER_POSITION_HISTORY) {
+      this.previousPositions = this.previousPositions.slice(0, GAME_CONFIG.PLAYER_POSITION_HISTORY);
+    }
   }
 
   addPowerUp(powerUp) {
@@ -618,7 +632,19 @@ export default class PlayerEntity {
     return new Phaser.Geom.Point(this.matterObj.x, this.matterObj.y);
   }
 
+  getPreviousPosition(preferredStepsBack = 0) {
+    if (this.previousPositions.length === 0) {
+      return this.getPosition();
+    }
+    const index = Phaser.Math.Clamp(preferredStepsBack, 0, this.previousPositions.length - 1);
+    return this.previousPositions[index];
+  }
+
   getSpeed() {
     return this.matterObj.body.speed;
+  }
+
+  getDistanceToPoint(point) {
+    return Phaser.Math.Distance.BetweenPoints(this.getPosition(), point);
   }
 }
