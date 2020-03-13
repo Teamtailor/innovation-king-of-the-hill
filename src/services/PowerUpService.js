@@ -39,11 +39,11 @@ export default class PowerUpService {
       x, y
     } = this.scene.getRandomGroundPosition();
     const index = MathUtils.GetWeightedRandomIndex(this.powerUpWeights);
-    return new this.powerUpConfigTypes[index].PowerUpClass(
+    return new this.powerUpConfigTypes[0].PowerUpClass(
       this.scene,
       x,
       y,
-      this.powerUpConfigTypes[index].svgAsset
+      this.powerUpConfigTypes[0].svgAsset
     ).init();
   }
 

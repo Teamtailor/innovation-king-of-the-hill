@@ -71,7 +71,7 @@ export default class PlayerEntity {
   }
 
   onCollideCallback({
-    bodyA, bodyB
+    bodyA, bodyB, collision
   }) {
     if (
       bodyB.collisionFilter.category === COLLISION_CATEGORIES.PLAYER &&
@@ -83,23 +83,29 @@ export default class PlayerEntity {
         collidedPlayer = this.scene.getPlayerFromBody(bodyA);
       }
 
-      this.lastCollidedPlayers = this.lastCollidedPlayers.filter(
-        ({
-          player
-        }) => player !== collidedPlayer
-      );
-
-      this.lastCollidedPlayers.push({
-        player: collidedPlayer,
-        time: Date.now()
-      });
-
-      collidedPlayer.collisions += 1;
+      this.updatePlayerCollision(collidedPlayer, collision);
     }
+  }
+
+  updatePlayerCollision(collidedPlayer, collision) {
+    this.lastCollidedPlayers = this.lastCollidedPlayers.filter(
+      ({
+        player
+      }) => player !== collidedPlayer
+    );
+
+    this.lastCollidedPlayers.push({
+      player: collidedPlayer,
+      time: Date.now()
+    });
+
+    collidedPlayer.collisions += 1;
   }
 
   updateAvailableStrength(delta) {
     this.availableStrength = this.strength - this.fatigue;
+
+    console.log('Strength?', this.availableStrength);
   }
 
   readMouse(delta, boost) {
@@ -210,7 +216,10 @@ export default class PlayerEntity {
     }
 
     this.matterObj.applyForce(force);
+    this.applyBoost(force, boost);
+  }
 
+  applyBoost(force, boost) {
     if (boost) {
       const boostForce = new Phaser.Math.Vector2(force)
         .normalize()
@@ -229,30 +238,34 @@ export default class PlayerEntity {
       this.chargingBoost = true;
     }
     if (boost.isUp && this.chargingBoost) {
-      this.chargingBoost = false;
-      this.boosting = true;
-
-      this.scene.tweens.add({
-        targets: this.playerAvatar.targets,
-        scale: (this.startScale + this.startScale * this.growthModifier) * 1.4,
-        ease: 'linear',
-        duration: 100,
-        yoyo: true,
-        repeat: 0,
-        onComplete: () => {
-          this.boosting = false;
-
-          this.playerAvatar.setScale(
-            this.startScale + this.startScale * this.growthModifier
-          );
-        }
-      });
-
-      this.fatigue += this.fatigue < 1 - 0.2 ? 0.2 : 1 - this.fatigue;
-      return 0.5 * this.availableStrength;
+      return this.boostUp();
     }
 
     return 0;
+  }
+
+  boostUp() {
+    this.chargingBoost = false;
+    this.boosting = true;
+
+    this.scene.tweens.add({
+      targets: this.playerAvatar.targets,
+      scale: (this.startScale + this.startScale * this.growthModifier) * 1.4,
+      ease: 'linear',
+      duration: 100,
+      yoyo: true,
+      repeat: 0,
+      onComplete: () => {
+        this.boosting = false;
+
+        this.playerAvatar.setScale(
+          this.startScale + this.startScale * this.growthModifier
+        );
+      }
+    });
+
+    this.fatigue += this.fatigue < 1 - 0.2 ? 0.2 : 1 - this.fatigue;
+    return 0.5 * this.availableStrength;
   }
 
   readController(delta) {

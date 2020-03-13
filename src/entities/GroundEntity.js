@@ -93,7 +93,7 @@ export default class GroundEntity {
   }
 
   getRandomPosition() {
-    const tile = this.getWeightedRandomBody(this.groundBodies);
+    const tile = this.getWeightedRandomBody(this.groundBodies.filter(b => b.label === 'main-ground'));
     const width = tile.bounds.max.x - tile.bounds.min.x;
     const height = tile.bounds.max.y - tile.bounds.min.y;
 

@@ -8,7 +8,10 @@ const {
   TARGET_TIREDNESS_TIME_MAX,
   TARGET_TIREDNESS_TIME_MIN,
   DEFAULT_SPEED,
-  SPEED_RANDOMNESS
+  SPEED_RANDOMNESS,
+  AI_STUCK_LIMIT,
+  BOOST_THRESHOLD,
+  BOOST_RANDOMNESS
 } = GAME_CONFIG.AI;
 
 export default class AiPlayerEntity extends PlayerEntity {
@@ -16,6 +19,9 @@ export default class AiPlayerEntity extends PlayerEntity {
   target = null;
   lastTargetUpdateTime = 0;
   currentTargetAttentionTime = 0;
+  lastCollision = null;
+  performBoost = false;
+  lastBoostTime = 0;
 
   constructor(scene, config) {
     super(scene, config);
@@ -32,18 +38,17 @@ export default class AiPlayerEntity extends PlayerEntity {
     }
   }
 
-  readController(delta) {
-  }
-
   spawn() {
     super.spawn();
     this.target = null;
+    this.lastCollision = null;
   }
 
   updateTarget(time) {
     if (this.shouldGetNewTarget()) {
       this.setTarget(Math.random() < 0.2 ? this.findAnyTarget() : this.findSuitableTarget(), time);
     } else if (this.tiredOfChasing(time)) {
+      console.log('TIRED?');
       this.setTarget(this.findSuitableTarget(this.target), time);
     }
   }
@@ -79,6 +84,11 @@ export default class AiPlayerEntity extends PlayerEntity {
     const vector = new Phaser.Math.Vector2(this.applySpeedModifiers(velX), this.applySpeedModifiers(velY));
     force.add(vector);
     this.matterObj.applyForce(force);
+
+    if (this.performBoost) {
+      this.applyBoost(force, this.boostUp());
+      this.performBoost = false;
+    }
   }
 
   getSpeed() {
@@ -112,7 +122,7 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   findSuitableTarget(excludedTarget) {
-    const possibleTargets = this.getPossiblePlayerTargets(true, excludedTarget ? [excludedTarget.id] : []).concat(this.getPowerUpTargets());
+    const possibleTargets = this.getPossiblePlayerTargets(true, excludedTarget ? [excludedTarget.id] : []); // .concat(this.getPowerUpTargets());
     if (possibleTargets.length === 0) {
       return null;
     }
@@ -131,7 +141,7 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   findAnyTarget() {
-    const possibleTargets = this.getPossiblePlayerTargets().concat(this.getPowerUpTargets());
+    const possibleTargets = this.getPossiblePlayerTargets(); // .concat(this.getPowerUpTargets());
     if (possibleTargets.length === 0) {
       return null;
     }
@@ -152,6 +162,60 @@ export default class AiPlayerEntity extends PlayerEntity {
     if (this.target && this.target.id === target.id) {
       console.log('AI players target is gone', this.id, this.target.id);
       this.target = null;
+    }
+  }
+
+  updateLastCollision(collidedPlayer, collision) {
+    const {
+      normal, tangent, penetration
+    } = collision;
+    this.lastCollision = {
+      player: collidedPlayer,
+      time: this.scene.time.now,
+      collision: {
+        normal,
+        tangent,
+        penetration
+      }
+    };
+  }
+
+  isStuckCollidingWithAI(collidedPlayer, collision) {
+    if (collidedPlayer.constructor.name !== this.constructor.name ||
+      this.lastCollision === null ||
+      this.scene.time.now > this.lastCollision.time + AI_STUCK_LIMIT
+    ) {
+      return;
+    }
+
+    const normalVector1 = new Phaser.Math.Vector2(collision.normal);
+    const normalVector2 = new Phaser.Math.Vector2(this.lastCollision.collision.normal);
+    return normalVector1.subtract(normalVector2).length() < 0.015;
+  }
+
+  compareWithLastCollisionValue(collision, property) {
+    const a = new Phaser.Math.Vector2(collision[property]);
+    const b = new Phaser.Math.Vector2(this.lastCollision.collision[property]);
+    return a.subtract(b);
+  }
+
+  updatePlayerCollision(collidedPlayer, collision) {
+    super.updatePlayerCollision(collidedPlayer, collision);
+    if (this.isStuckCollidingWithAI(collidedPlayer, collision)) {
+      this.makeStuckDescision();
+    }
+    this.updateLastCollision(collidedPlayer, collision);
+  }
+
+  makeStuckDescision() {
+    if (Math.random() < 0.5) {
+      console.log('STUCK, GETTING NEW TARGET');
+      this.target = null;
+    } else {
+      console.log('STUCK, LET*S BOOST');
+      if (!this.boosting) {
+        this.performBoost = true;
+      }
     }
   }
 }
