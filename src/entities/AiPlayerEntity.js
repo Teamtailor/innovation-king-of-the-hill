@@ -5,7 +5,10 @@ import {
 } from '../config/constants';
 
 const {
-  TARGET_TIREDNESS_TIME_MAX, TARGET_TIREDNESS_TIME_MIN
+  TARGET_TIREDNESS_TIME_MAX,
+  TARGET_TIREDNESS_TIME_MIN,
+  DEFAULT_SPEED,
+  SPEED_RANDOMNESS
 } = GAME_CONFIG.AI;
 
 export default class AiPlayerEntity extends PlayerEntity {
@@ -70,14 +73,20 @@ export default class AiPlayerEntity extends PlayerEntity {
     } = this.velocityToTarget(
       this.getPosition(),
       gotoPosition,
-      this.target
-        ? GAME_CONFIG.DEFAULT_SPEED
-        : GAME_CONFIG.DEFAULT_SPEED * 0.25
+      this.getSpeed()
     );
 
     const vector = new Phaser.Math.Vector2(this.applySpeedModifiers(velX), this.applySpeedModifiers(velY));
     force.add(vector);
     this.matterObj.applyForce(force);
+  }
+
+  getSpeed() {
+    const speed = this.target
+      ? DEFAULT_SPEED
+      : DEFAULT_SPEED * 0.3;
+
+    return speed + Math.random() * SPEED_RANDOMNESS;
   }
 
   addPowerUp(powerUp) {
