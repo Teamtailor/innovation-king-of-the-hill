@@ -130,7 +130,7 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   shouldGetNewTarget() {
-    return this.target === null || !this.target.isActive || (!this.edgeSensorGrounds && this.jumpSensorGrounds);
+    return this.target === null || !this.target.isActive || (!this.edgeSensorGrounds && this.jumpSensorGrounds && !this.boosting);
   }
 
   tiredOfChasing(time) {

@@ -109,7 +109,7 @@ export default class PlayerEntity {
   }
 
   createJumpSensor() {
-    this.jumpSensor = this.scene.matter.add.rectangle(0, 0, 60, 10, {
+    this.jumpSensor = this.scene.matter.add.rectangle(0, 0, 70, 10, {
       isSensor: true,
       collisionFilter: {
         category: COLLISION_CATEGORIES.PLAYER_SENSOR,
@@ -532,8 +532,8 @@ export default class PlayerEntity {
       };
 
       this.jumpSensorConstraint.pointA = {
-        x: rotation.x * 80,
-        y: rotation.y * 80
+        x: rotation.x * 75,
+        y: rotation.y * 75
       };
 
       this.jumpSensor.angle = this.velocityAngle;
