@@ -108,7 +108,7 @@ export default class PlayerEntity {
   }
 
   createJumpSensor() {
-    this.jumpSensor = this.scene.matter.add.rectangle(0, 0, 100, 10, {
+    this.jumpSensor = this.scene.matter.add.rectangle(0, 0, 60, 10, {
       isSensor: true,
       collisionFilter: {
         category: COLLISION_CATEGORIES.PLAYER_SENSOR,
@@ -350,7 +350,7 @@ export default class PlayerEntity {
   }
 
   updateMask() {
-    this.playerAvatar.setRotation(this.matterObj.rotation);
+    this.playerAvatar.setRotation(this.velocityAngle + 1.5708);
     this.playerAvatar.setPosition(this.matterObj.x, this.matterObj.y);
   }
 
@@ -501,26 +501,28 @@ export default class PlayerEntity {
     return !!this.grounds.length;
   }
 
+  updateVelocityAngle() {
+    const velocity = new Phaser.Math.Vector2(this.matterObj.body.velocity);
+    this.velocityAngle = velocity.angle();
+  }
+
   rotateSensors() {
     if (!this.jumpSensor) {
       return;
     }
 
-    const velocity = new Phaser.Math.Vector2(this.matterObj.body.velocity);
-
-    if (velocity.length() > 2) {
-      const angle = velocity.angle();
+    if (this.matterObj.body.speed > 2) {
       const rotation = Phaser.Physics.Matter.Matter.Vector.rotate(
         {
           x: 1,
           y: 0
         },
-        angle
+        this.velocityAngle
       );
 
       this.edgeSensorConstraint.pointA = {
-        x: rotation.x * 26,
-        y: rotation.y * 26
+        x: rotation.x * 10,
+        y: rotation.y * 10
       };
 
       this.jumpSensorConstraint.pointA = {
@@ -528,11 +530,13 @@ export default class PlayerEntity {
         y: rotation.y * 100
       };
 
-      this.jumpSensor.angle = angle;
+      this.jumpSensor.angle = this.velocityAngle;
     }
   }
 
   update(time, delta) {
+    this.updateVelocityAngle();
+
     this.rotateSensors();
     this.updateAvailableStrength(delta);
     this.updateMask();

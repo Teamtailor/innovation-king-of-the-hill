@@ -58,7 +58,8 @@ export default class PressToJoin {
           image,
           color,
           controls,
-          useMouse
+          useMouse,
+          autoJump: false
         });
       }
 
