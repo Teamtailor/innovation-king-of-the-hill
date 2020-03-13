@@ -34,9 +34,9 @@ export default class AiPlayerEntity extends PlayerEntity {
 
   updateTarget(time) {
     if (this.shouldGetNewTarget()) {
-      this.setTarget(Math.random() < 0.2 ? this.findSomeTarget() : this.findSuitableTarget(), time);
+      this.setTarget(Math.random() < 0.2 ? this.findAnyTarget() : this.findSuitableTarget(), time);
     } else if (this.tiredOfChasing(time)) {
-      this.setTarget(this.findSomeTarget(), time);
+      this.setTarget(this.findSuitableTarget(this.target), time);
     }
   }
 
@@ -75,8 +75,9 @@ export default class AiPlayerEntity extends PlayerEntity {
     this.matterObj.applyForce(force);
   }
 
-  getPossibleTargets(onSameContinent = false) {
-    const targets = this.scene.players.filter(player => (player.isAlive && player.id !== this.id));
+  getPossibleTargets(onSameContinent = false, excludedTargetIds = []) {
+    excludedTargetIds.push(this.id);
+    const targets = this.scene.players.filter(player => (player.isAlive && !excludedTargetIds.includes(player.id)));
     if (!onSameContinent) {
       return targets;
     }
@@ -87,8 +88,8 @@ export default class AiPlayerEntity extends PlayerEntity {
     });
   }
 
-  findSuitableTarget() {
-    const possibleTargets = this.getPossibleTargets(true);
+  findSuitableTarget(excludedTarget) {
+    const possibleTargets = this.getPossibleTargets(true, excludedTarget ? [excludedTarget.id] : []);
     if (possibleTargets.length === 0) {
       return null;
     }
@@ -106,7 +107,7 @@ export default class AiPlayerEntity extends PlayerEntity {
     return closestTarget;
   }
 
-  findSomeTarget() {
+  findAnyTarget() {
     const possibleTargets = this.getPossibleTargets();
     if (possibleTargets.length === 0) {
       return null;
