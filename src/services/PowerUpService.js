@@ -6,6 +6,7 @@ import MathUtils from '../utils/Math';
 export default class PowerUpService {
   nextSpawnTime = 0;
   lastSpawn = 0;
+  available = [];
   powerUpWeights = [];
 
   constructor(scene) {
@@ -47,10 +48,16 @@ export default class PowerUpService {
   }
 
   update(time) {
+    this.tidyNonConsumable();
+
     if (time > this.lastSpawn + this.nextSpawnTime) {
-      this.spawn(time);
+      this.available.push(this.spawn(time));
       this.lastSpawn = time;
       this.setSpawnTime();
     }
+  }
+
+  tidyNonConsumable() {
+    this.available = this.available.filter((powerUp) => powerUp.isActive);
   }
 }

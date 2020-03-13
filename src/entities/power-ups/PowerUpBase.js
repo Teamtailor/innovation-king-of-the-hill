@@ -12,7 +12,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   removeAnimation = null;
   consumingAnimation = null;
   id = null;
-  isDestroyed = false;
+  shouldDestroy = false;
   isConsumed = false;
   label = null;
 
@@ -36,6 +36,10 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
     this.scene.add.existing(this);
     this.addRemoveTimerEvent();
     return this;
+  }
+
+  get isActive() {
+    return !this.shouldDestroy && !this.isConsumed && this.body;
   }
 
   applyConfig() {
@@ -80,13 +84,14 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
 
   consume(playerBody) {
     const player = this.scene.getPlayerFromBody(playerBody);
-    if (!player.isAlive || this.isDestroyed) {
+    if (!player.isAlive || this.isConsum || this.isConsumed) {
       return;
     }
 
     this.setCollisionCategory(COLLISION_CATEGORIES.NONE);
     this.attachToPlayer(player);
     this.isConsumed = true;
+    this.scene.events.emit('power-up-consumed', this);
 
     console.log('Consuming power up', {
       player,
@@ -153,17 +158,17 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
 
   onAnimateRemoveComplete() {
     console.log('Idle animation complete', this);
-    if (this.isConsumed || (this.consumingAnimation && this.consumingAnimation.isPlaying())) {
-      return;
+    if (!this.isConsumed) {
+      this.destroy();
     }
-    this.destroy();
   }
 
   onAnimateRemoveUpdate({
     progress
   }) {
-    if (!this.isDestroyed && progress > 0.7) {
-      this.isDestroyed = true;
+    if (!this.shouldDestroy && progress > 0.7) {
+      this.scene.events.emit('power-up-removed', this);
+      this.shouldDestroy = true;
       this.setCollisionCategory(COLLISION_CATEGORIES.NONE);
     }
   }
@@ -220,5 +225,13 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
 
   onEffecWornOut(player) {
     this.detachFromPlayer(player);
+  }
+
+  hasPosition() {
+    return !!this.body;
+  }
+
+  getPosition() {
+    return new Phaser.Geom.Point(this.x, this.y);
   }
 }

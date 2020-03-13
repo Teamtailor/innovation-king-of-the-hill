@@ -66,6 +66,10 @@ export default class PlayerEntity {
     }
   }
 
+  get isActive() {
+    return this.isAlive;
+  }
+
   onCollideCallback({
     bodyA, bodyB
   }) {
@@ -516,6 +520,10 @@ export default class PlayerEntity {
 
   setReversedControls(value) {
     this.reverseControls = value;
+  }
+
+  hasPosition() {
+    return !!this.matterObj;
   }
 
   getPosition() {

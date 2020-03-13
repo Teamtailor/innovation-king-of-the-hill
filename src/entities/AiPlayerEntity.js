@@ -16,7 +16,9 @@ export default class AiPlayerEntity extends PlayerEntity {
 
   constructor(scene, config) {
     super(scene, config);
-    this.scene.events.on('player-dead', this.handlePlayerDead, this);
+    this.scene.events.on('player-dead', this.handleTargetGone, this);
+    this.scene.events.on('power-up-removed', this.handleTargetGone, this);
+    this.scene.events.on('power-up-consumed', this.handleTargetGone, this);
   }
 
   update(time, delta) {
@@ -52,7 +54,7 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   shouldGetNewTarget() {
-    return this.target === null || !this.target.isAlive;
+    return this.target === null || !this.target.isActive;
   }
 
   tiredOfChasing(time) {
@@ -61,8 +63,7 @@ export default class AiPlayerEntity extends PlayerEntity {
 
   move() {
     const force = new Phaser.Math.Vector2(0, 0);
-
-    const gotoPosition = this.target ? this.target.getPosition() : this.scene.ground.sprite;
+    const gotoPosition = (this.target && this.target.hasPosition()) ? this.target.getPosition() : this.scene.ground.sprite;
 
     const {
       velX, velY
@@ -79,7 +80,12 @@ export default class AiPlayerEntity extends PlayerEntity {
     this.matterObj.applyForce(force);
   }
 
-  getPossibleTargets(onSameContinent = false, excludedTargetIds = []) {
+  addPowerUp(powerUp) {
+    super.addPowerUp(powerUp);
+    this.target = null;
+  }
+
+  getPossiblePlayerTargets(onSameContinent = false, excludedTargetIds = []) {
     excludedTargetIds.push(this.id);
     const targets = this.scene.players.filter(player => (player.isAlive && !excludedTargetIds.includes(player.id)));
     if (!onSameContinent) {
@@ -92,8 +98,12 @@ export default class AiPlayerEntity extends PlayerEntity {
     });
   }
 
+  getPowerUpTargets() {
+    return this.scene.powerUpService.available;
+  }
+
   findSuitableTarget(excludedTarget) {
-    const possibleTargets = this.getPossibleTargets(true, excludedTarget ? [excludedTarget.id] : []);
+    const possibleTargets = this.getPossiblePlayerTargets(true, excludedTarget ? [excludedTarget.id] : []).concat(this.getPowerUpTargets());
     if (possibleTargets.length === 0) {
       return null;
     }
@@ -112,7 +122,7 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   findAnyTarget() {
-    const possibleTargets = this.getPossibleTargets();
+    const possibleTargets = this.getPossiblePlayerTargets().concat(this.getPowerUpTargets());
     if (possibleTargets.length === 0) {
       return null;
     }
@@ -129,9 +139,9 @@ export default class AiPlayerEntity extends PlayerEntity {
     };
   }
 
-  handlePlayerDead(player) {
-    if (this.target && this.target.id === player.id) {
-      console.log('AI players target died', this.id, this.target.id);
+  handleTargetGone(target) {
+    if (this.target && this.target.id === target.id) {
+      console.log('AI players target is gone', this.id, this.target.id);
       this.target = null;
     }
   }
