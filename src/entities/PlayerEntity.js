@@ -104,8 +104,6 @@ export default class PlayerEntity {
 
   updateAvailableStrength(delta) {
     this.availableStrength = this.strength - this.fatigue;
-
-    console.log('Strength?', this.availableStrength);
   }
 
   readMouse(delta, boost) {
@@ -219,11 +217,18 @@ export default class PlayerEntity {
     this.applyBoost(force, boost);
   }
 
-  applyBoost(force, boost) {
+  applyBoost(force, boost, degrees = 0) {
     if (boost) {
+      const boostVector = degrees === 0
+        ? new Phaser.Math.Vector2(boost, boost)
+        : Phaser.Physics.Matter.Matter.Vector.rotate(
+          new Phaser.Math.Vector2(boost, boost),
+          Phaser.Math.DegToRad(degrees)
+        );
+
       const boostForce = new Phaser.Math.Vector2(force)
         .normalize()
-        .multiply(new Phaser.Math.Vector2(boost, boost));
+        .multiply(boostVector);
 
       this.matterObj.applyForce(boostForce);
     }

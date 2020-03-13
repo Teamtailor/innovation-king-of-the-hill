@@ -8,10 +8,10 @@ const GROW_MODIFIERS = {
 
 export default class Grow extends PowerUpBase {
   onAttachToPlayer(player) {
-    // player.grow(GROW_MODIFIERS);
+    player.grow(GROW_MODIFIERS);
   }
 
   onDetachFromPlayer(player) {
-    // player.shrink(GROW_MODIFIERS);
+    player.shrink(GROW_MODIFIERS);
   }
 }

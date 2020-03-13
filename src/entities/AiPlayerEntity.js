@@ -11,7 +11,9 @@ const {
   SPEED_RANDOMNESS,
   AI_STUCK_LIMIT,
   BOOST_THRESHOLD,
-  BOOST_RANDOMNESS
+  BOOST_DELAY_RANDOMNESS,
+  BOOST_DIRECTION_MIN,
+  BOOST_DIRECTION_MAX
 } = GAME_CONFIG.AI;
 
 export default class AiPlayerEntity extends PlayerEntity {
@@ -22,6 +24,7 @@ export default class AiPlayerEntity extends PlayerEntity {
   lastCollision = null;
   performBoost = false;
   lastBoostTime = 0;
+  performBoostAt = null;
 
   constructor(scene, config) {
     super(scene, config);
@@ -48,7 +51,6 @@ export default class AiPlayerEntity extends PlayerEntity {
     if (this.shouldGetNewTarget()) {
       this.setTarget(Math.random() < 0.2 ? this.findAnyTarget() : this.findSuitableTarget(), time);
     } else if (this.tiredOfChasing(time)) {
-      console.log('TIRED?');
       this.setTarget(this.findSuitableTarget(this.target), time);
     }
   }
@@ -85,10 +87,18 @@ export default class AiPlayerEntity extends PlayerEntity {
     force.add(vector);
     this.matterObj.applyForce(force);
 
-    if (this.performBoost) {
-      this.applyBoost(force, this.boostUp());
-      this.performBoost = false;
+    if (this.shouldPerformBoost()) {
+      const direction = Phaser.Math.Between(BOOST_DIRECTION_MIN, BOOST_DIRECTION_MAX) * Math.random() < 0.5 ? 1 : -1;
+      this.applyBoost(force, this.boostUp(), direction);
+      this.performBoostAt = null;
+      this.lastBoostTime = this.scene.time.now;
     }
+  }
+
+  shouldPerformBoost() {
+    return (this.performBoostAt &&
+      this.performBoostAt < this.scene.time.now &&
+      this.scene.time.now > this.lastBoostTime + BOOST_THRESHOLD);
   }
 
   getSpeed() {
@@ -122,7 +132,7 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   findSuitableTarget(excludedTarget) {
-    const possibleTargets = this.getPossiblePlayerTargets(true, excludedTarget ? [excludedTarget.id] : []); // .concat(this.getPowerUpTargets());
+    const possibleTargets = this.getPossiblePlayerTargets(true, excludedTarget ? [excludedTarget.id] : []).concat(this.getPowerUpTargets());
     if (possibleTargets.length === 0) {
       return null;
     }
@@ -141,7 +151,7 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   findAnyTarget() {
-    const possibleTargets = this.getPossiblePlayerTargets(); // .concat(this.getPowerUpTargets());
+    const possibleTargets = this.getPossiblePlayerTargets().concat(this.getPowerUpTargets());
     if (possibleTargets.length === 0) {
       return null;
     }
@@ -209,13 +219,9 @@ export default class AiPlayerEntity extends PlayerEntity {
 
   makeStuckDescision() {
     if (Math.random() < 0.5) {
-      console.log('STUCK, GETTING NEW TARGET');
       this.target = null;
-    } else {
-      console.log('STUCK, LET*S BOOST');
-      if (!this.boosting) {
-        this.performBoost = true;
-      }
+    } else if (!this.boosting && !this.performBoostAt) {
+      this.performBoostAt = Phaser.Math.Between(BOOST_THRESHOLD * BOOST_DELAY_RANDOMNESS, BOOST_THRESHOLD) + this.scene.time.now;
     }
   }
 }
