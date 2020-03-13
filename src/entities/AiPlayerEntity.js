@@ -4,12 +4,15 @@ import {
   GAME_CONFIG
 } from '../config/constants';
 
-const TARGET_TIREDNESS_TIME = 3500;
+const {
+  TARGET_TIREDNESS_TIME_MAX, TARGET_TIREDNESS_TIME_MIN
+} = GAME_CONFIG.AI;
 
 export default class AiPlayerEntity extends PlayerEntity {
   disableController = true;
   target = null;
-  lastTargetTime = 0;
+  lastTargetUpdateTime = 0;
+  currentTargetAttentionTime = 0;
 
   constructor(scene, config) {
     super(scene, config);
@@ -43,7 +46,8 @@ export default class AiPlayerEntity extends PlayerEntity {
   setTarget(target, time) {
     if (target) {
       this.target = target;
-      this.lastTargetTime = time;
+      this.lastTargetUpdateTime = time;
+      this.currentTargetAttentionTime = Phaser.Math.Between(TARGET_TIREDNESS_TIME_MIN, TARGET_TIREDNESS_TIME_MAX);
     }
   }
 
@@ -52,7 +56,7 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   tiredOfChasing(time) {
-    return this.lastTargetTime + TARGET_TIREDNESS_TIME < time;
+    return this.lastTargetUpdateTime + this.currentTargetAttentionTime < time;
   }
 
   move() {

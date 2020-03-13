@@ -13,7 +13,11 @@ export default {
 };
 
 export const GAME_CONFIG = {
-  DEFAULT_SPEED: 0.05
+  DEFAULT_SPEED: 0.05,
+  AI: {
+    TARGET_TIREDNESS_TIME_MIN: 2500,
+    TARGET_TIREDNESS_TIME_MAX: 4300
+  }
 };
 
 export const COLLISION_CATEGORIES = {
