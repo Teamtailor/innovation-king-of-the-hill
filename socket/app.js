@@ -29,6 +29,12 @@ io.on('connection', function (socket) {
     activeUsers.push(user);
     io.emit('activeUsers', activeUsers);
   });
+
+  socket.on('userAction', function(user) {
+    activeUsers = activeUsers.filter((u) => { return (u.id !== user.id); });
+    activeUsers.push(user);
+    io.emit('playerMoved', activeUsers);
+  });
 });
 
 setInterval(function() {

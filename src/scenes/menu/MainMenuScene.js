@@ -15,7 +15,11 @@ class MainMenuScene extends BaseScene {
     this.user = {
       name: url.searchParams.get('user'),
       level: url.searchParams.get('level'),
-      avatar: url.searchParams.get('avatar')
+      avatar: url.searchParams.get('avatar'),
+      position: {
+        x: 0,
+        y: 0
+      }
     };
   }
 
