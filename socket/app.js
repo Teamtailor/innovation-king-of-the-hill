@@ -8,7 +8,7 @@ const io = require('socket.io').listen(server);
 let activeUsers = [];
 const inactiveTime = 3;
 
-server.listen(3000);
+server.listen(3005);
 
 app.get('/', function (req, res) {
   console.log('Homepage');

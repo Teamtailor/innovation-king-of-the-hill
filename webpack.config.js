@@ -29,6 +29,9 @@ module.exports = {
     filename: '[name].js'
   },
   watch: true,
+  watchOptions: {
+    ignored: ['app.js']
+  },
   plugins: [
     definePlugin,
     // new webpack.optimize.CommonsChunkPlugin({ name: 'vendor'/* chunkName= */, filename: 'vendor.bundle.js'/* filename= */ }),
@@ -62,6 +65,7 @@ module.exports = {
       {
         test: /\.js$/,
         use: ['babel-loader'],
+        exclude: /app.js$/,
         include: path.join(__dirname, 'src')
       },
       {

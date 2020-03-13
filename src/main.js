@@ -4,7 +4,7 @@ import constants from './config/constants';
 import BootScene from './scenes/BootScene';
 
 window.Phaser = Phaser;
-window.SocketIO = io('http://localhost:3000');
+window.SocketIO = io('http://localhost:3005');
 
 const config = {
   type: Phaser.WEBGL,
