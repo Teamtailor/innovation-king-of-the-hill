@@ -71,9 +71,26 @@ export default class AiPlayerEntity extends PlayerEntity {
     return this.lastTargetUpdateTime + this.currentTargetAttentionTime < time;
   }
 
+  hasReachedIdlePosition() {
+    return Phaser.Math.Distance.BetweenPoints(this.getPosition(), this.scene.ground.sprite) < 50;
+  }
+
+  hasTarget() {
+    return this.target && this.target.hasPosition();
+  }
+
   move() {
     const force = new Phaser.Math.Vector2(0, 0);
-    const gotoPosition = (this.target && this.target.hasPosition()) ? this.target.getPosition() : this.scene.ground.sprite;
+
+    if (!this.hasTarget() && this.hasReachedIdlePosition()) {
+      const tenthOfTime = Phaser.Math.RoundTo(this.scene.time.now / 100, 2) / 100;
+      this.matterObj.setAngularVelocity(0.15 * (Phaser.Math.IsEven(tenthOfTime) ? -1 : 1));
+      return;
+    }
+
+    const gotoPosition = this.hasTarget()
+      ? this.target.getPosition()
+      : this.scene.ground.sprite;
 
     const {
       velX, velY
@@ -92,6 +109,7 @@ export default class AiPlayerEntity extends PlayerEntity {
       this.applyBoost(force, this.boostUp(), direction);
       this.performBoostAt = null;
       this.lastBoostTime = this.scene.time.now;
+      this.matterObj.setAngularVelocity(Math.random() * 40 - 20);
     }
   }
 
