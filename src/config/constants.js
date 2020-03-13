@@ -39,6 +39,8 @@ export const DEPTHS = {
 export const POWER_UP_CONFIG = {
   MIN_SPAWN_TIME: 1500,
   MAX_SPAWN_TIME: 3500,
+  IDLE_TIME_MIN: 1800,
+  IDLE_TIME_MAX: 3400,
 
   TYPES: {
     [Grow.name]: {

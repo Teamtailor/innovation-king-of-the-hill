@@ -9,7 +9,6 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   effectWornOutTimerEvent = null;
   idleTimerEvent = null;
   effectLifeTime = 0;
-  idleLifetime = 3000;
   removeAnimation = null;
   consumingAnimation = null;
   id = null;
@@ -53,7 +52,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
 
   addRemoveTimerEvent() {
     this.idleTimerEvent = this.scene.time.addEvent({
-      delay: this.idleLifetime,
+      delay: Phaser.Math.Between(POWER_UP_CONFIG.IDLE_TIME_MIN, POWER_UP_CONFIG.IDLE_TIME_MAX),
       callback: this.onTooLongIdleEvent,
       callbackScope: this
     });
