@@ -5,7 +5,7 @@
   "author": "Teamtailor",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --mode=development",
+    "start": "webpack --mode=development ",
     "startprodtest": "webpack --mode=development  --config webpack.productiontest.config.js",
     "build": "webpack  --mode=production --config webpack.production.config.js",
     "multiplayer": "yarn build && node app.js",

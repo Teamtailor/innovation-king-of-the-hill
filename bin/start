@@ -1,0 +1,3 @@
+#!/bin/bash
+node socket/app.js &
+yarn start
