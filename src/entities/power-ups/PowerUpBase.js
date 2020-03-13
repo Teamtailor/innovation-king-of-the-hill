@@ -154,7 +154,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
 
   onAnimateRemoveComplete() {
     console.log('Idle animation complete', this);
-    if (this.consumingAnimation && this.consumingAnimation.isPlaying()) {
+    if (this.isConsumed || (this.consumingAnimation && this.consumingAnimation.isPlaying())) {
       return;
     }
     this.destroy();
