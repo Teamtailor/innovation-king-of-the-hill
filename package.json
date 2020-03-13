@@ -8,7 +8,7 @@
     "start": "webpack --mode=development ",
     "startprodtest": "webpack --mode=development  --config webpack.productiontest.config.js",
     "build": "webpack  --mode=production --config webpack.production.config.js",
-    "multiplayer": "yarn build && node app.js",
+    "multiplayer": "yarn build && node socket/app.js",
     "test": "eslint ./src/**/**.js",
     "lint": "eslint src --max-warnings 0",
     "lintfix": "yarn lint -- --fix"

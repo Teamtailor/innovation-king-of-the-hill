@@ -11,8 +11,7 @@ const inactiveTime = 3;
 server.listen(3005);
 
 app.get('/', function (req, res) {
-  console.log('Homepage');
-  res.sendFile(path.join(__dirname, '/dist/index.html'));
+  res.sendFile(path.join(__dirname, 'dist/index.html'));
 });
 
 app.use('/static', express.static('node_modules'));
