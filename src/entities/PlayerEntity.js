@@ -402,6 +402,7 @@ export default class PlayerEntity {
   fall() {
     return new Promise(resolve => {
       this.updateDeathScores();
+      this.scene.events.emit('player-dead', this);
 
       this.isAlive = false;
       this.playerAvatar.setDepth(DEPTHS.UNDER_GROUND);
