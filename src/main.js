@@ -23,10 +23,6 @@ const config = {
       gravity: {
         x: 0,
         y: 0
-      },
-      debug: {
-        showVelocity: true,
-        showBody: true
       }
     }
   },
