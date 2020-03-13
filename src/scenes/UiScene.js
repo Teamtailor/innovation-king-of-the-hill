@@ -33,23 +33,7 @@ class UiScene extends BaseScene {
 
   createJoinButtons() {
     const join1 = new PressToJoin(this, this.gameScene, {
-      text: 'PRESS SPACE TO JOIN',
-      image: 'rikard',
-      color: 0xffffff * Math.random(),
-      controls: {
-        up: 'up',
-        down: 'down',
-        left: 'left',
-        right: 'right',
-        boost: 'space'
-      },
-      joinButton: 'space'
-    });
-    join1.label.setOrigin(0, 0.5);
-    join1.label.setPosition(150, 50);
-
-    const join2 = new PressToJoin(this, this.gameScene, {
-      text: 'PRESS Q TO JOIN',
+      text: 'PRESS Q TO JOIN (WASD)',
       image: 'anders',
       color: 0xffffff * Math.random(),
       controls: {
@@ -61,6 +45,27 @@ class UiScene extends BaseScene {
       },
       joinButton: 'q'
     });
+    join1.label.setOrigin(0, 0.5);
+    join1.label.setPosition(150, 50);
+
+    const join2 = new PressToJoin(
+      this,
+      this.gameScene,
+
+      {
+        text: 'PRESS SPACE TO JOIN',
+        image: 'rikard',
+        color: 0xffffff * Math.random(),
+        controls: {
+          up: 'up',
+          down: 'down',
+          left: 'left',
+          right: 'right',
+          boost: 'space'
+        },
+        joinButton: 'space'
+      }
+    );
     join2.label.setOrigin(0.5);
     join2.label.setPosition(this.game.config.width / 2, 50);
 
@@ -86,7 +91,7 @@ class UiScene extends BaseScene {
     join4.label.setOrigin(1, 0.5);
     join4.label.setPosition(
       this.game.config.width - 150,
-      this.game.config.height - 20
+      this.game.config.height - 60
     );
   }
 
