@@ -16,7 +16,8 @@ const {
   BOOST_DIRECTION_MIN,
   BOOST_DIRECTION_MAX,
   DEFAULT_REACTION_TIME,
-  REACTION_SPEED_RANDOMNESS
+  REACTION_SPEED_RANDOMNESS,
+  AI_TARGET_DISTANCE_HISTORY
 } = GAME_CONFIG.AI;
 
 export default class AiPlayerEntity extends PlayerEntity {
@@ -30,7 +31,13 @@ export default class AiPlayerEntity extends PlayerEntity {
   performBoostAt = null;
   lastMoveVector = null;
   shouldUpdateReactionTimeAt = 0;
+  shouldMakeStuckDescisionAt = 0;
   currentReactionTime = DEFAULT_REACTION_TIME;
+  aiTargetDistances = [];
+
+  maneuverStartTime = 0;
+  maneuverTime = 0;
+  maneuverToPoint = null;
 
   constructor(scene, config) {
     super(scene, config);
@@ -42,9 +49,34 @@ export default class AiPlayerEntity extends PlayerEntity {
   update(time, delta) {
     super.update(time, delta);
     if (this.isAlive) {
+      this.makeStuckDescision(time);
       this.updateTarget(time);
       this.updateReactionTime(time);
+      this.updateTargetDistances(time);
+      this.updateManeuver(time);
       this.move(time);
+    }
+  }
+
+  updateManeuver(time) {
+    if (!this.maneuverToPoint) {
+      return;
+    }
+
+    if (time > this.maneuverStartTime + this.maneuverTime ||
+      this.getDistanceToPoint(this.maneuverToPoint) < 20) {
+      this.resetManeuver();
+    }
+  }
+
+  updateTargetDistances(time) {
+    if (!this.hasTarget() || !this.isTargetAiPlayer()) {
+      return;
+    }
+
+    this.aiTargetDistances.unshift(this.getDistanceToPoint(this.target.getPosition()));
+    if (this.aiTargetDistances.length > AI_TARGET_DISTANCE_HISTORY) {
+      this.aiTargetDistances = this.aiTargetDistances.slice(0, AI_TARGET_DISTANCE_HISTORY);
     }
   }
 
@@ -70,10 +102,13 @@ export default class AiPlayerEntity extends PlayerEntity {
 
   spawn() {
     super.spawn();
+    this.resetManeuver();
+
     this.target = null;
     this.lastCollision = null;
     this.currentReactionTime = DEFAULT_REACTION_TIME;
     this.shouldUpdateReactionTimeAt = 0;
+    this.shouldMakeStuckDescisionAt = 0;
   }
 
   updateTarget(time) {
@@ -90,6 +125,7 @@ export default class AiPlayerEntity extends PlayerEntity {
       this.lastTargetUpdateTime = time;
       this.currentTargetAttentionTime = Phaser.Math.Between(TARGET_TIREDNESS_TIME_MIN, TARGET_TIREDNESS_TIME_MAX);
       this.shouldUpdateReactionTimeAt = 0;
+      this.aiTargetDistances = [];
     }
   }
 
@@ -117,6 +153,48 @@ export default class AiPlayerEntity extends PlayerEntity {
     return this.target.type === COLLISION_CATEGORIES.PLAYER;
   }
 
+  isTargetAiPlayer() {
+    return this.target.type === COLLISION_CATEGORIES.PLAYER && this.target.constructor.name === this.constructor.name;
+  }
+
+  getPointOfInterest(time) {
+    if (!this.hasTarget()) {
+      return this.scene.ground.sprite;
+    }
+
+    if (this.isManeuvering()) {
+      return this.maneuverToPoint;
+    }
+
+    if (!this.isTargetPlayer()) {
+      return this.target.getPosition();
+    }
+
+    if (this.isTargetAiPlayer() && this.notCatchingUp() && Math.random() < 0.10) {
+      return this.doManeuver(time);
+    } else {
+      return this.target.getPreviousPosition(this.currentReactionTime);
+    }
+  }
+
+  isManeuvering() {
+    return !!this.maneuverToPoint;
+  }
+
+  resetManeuver() {
+    this.maneuverStartTime = 0;
+    this.maneuverTime = 0;
+    this.maneuverToPoint = null;
+  }
+
+  doManeuver(time) {
+    const continent = this.grounds.length === 0 ? 'main-ground' : this.grounds[0].label;
+    this.maneuverToPoint = this.scene.getRandomGroundPosition(continent);
+    this.maneuverStartTime = time;
+    this.maneuverTime = Phaser.Math.Between(250, 500);
+    return this.maneuverToPoint;
+  }
+
   move(time) {
     const force = new Phaser.Math.Vector2(0, 0);
 
@@ -126,14 +204,7 @@ export default class AiPlayerEntity extends PlayerEntity {
       return;
     }
 
-    let pointOfInterest = null;
-    if (this.hasTarget()) {
-      pointOfInterest = this.isTargetPlayer()
-        ? this.target.getPreviousPosition(this.currentReactionTime)
-        : this.target.getPosition();
-    } else {
-      pointOfInterest = this.scene.ground.sprite;
-    }
+    const pointOfInterest = this.getPointOfInterest(time);
 
     const {
       velX, velY
@@ -155,6 +226,13 @@ export default class AiPlayerEntity extends PlayerEntity {
       this.lastBoostTime = time;
       this.matterObj.setAngularVelocity(Math.random() * 40 - 20);
     }
+  }
+
+  notCatchingUp() {
+    if (this.aiTargetDistances.length < AI_TARGET_DISTANCE_HISTORY) {
+      return false;
+    }
+    return Math.max(...this.aiTargetDistances) - Math.min(...this.aiTargetDistances) < 45;
   }
 
   shouldPerformBoost(time) {
@@ -232,7 +310,6 @@ export default class AiPlayerEntity extends PlayerEntity {
 
   handleTargetGone(target) {
     if (this.target && this.target.id === target.id) {
-      console.log('AI players target is gone', this.id, this.target.id);
       this.target = null;
     }
   }
@@ -250,6 +327,7 @@ export default class AiPlayerEntity extends PlayerEntity {
         penetration
       }
     };
+    this.aiTargetDistances = [];
   }
 
   isStuckCollidingWithAI(collidedPlayer, collision) {
@@ -274,16 +352,32 @@ export default class AiPlayerEntity extends PlayerEntity {
   updatePlayerCollision(collidedPlayer, collision) {
     super.updatePlayerCollision(collidedPlayer, collision);
     if (this.isStuckCollidingWithAI(collidedPlayer, collision)) {
-      this.makeStuckDescision();
+      this.shouldMakeStuckDescisionAt = this.scene.time.now + Phaser.Math.Between(20, 120);
     }
     this.updateLastCollision(collidedPlayer, collision);
   }
 
-  makeStuckDescision() {
-    if (Math.random() < 0.5) {
-      this.target = null;
-    } else if (!this.boosting && !this.performBoostAt) {
-      this.performBoostAt = Phaser.Math.Between(BOOST_THRESHOLD * BOOST_DELAY_RANDOMNESS, BOOST_THRESHOLD) + this.scene.time.now;
+  shouldMakeStuckDescision() {
+    return this.shouldMakeStuckDescisionAt > 0;
+  }
+
+  makeStuckDescision(time) {
+    if (!this.shouldMakeStuckDescision() || time < this.shouldMakeStuckDescisionAt) {
+      return;
     }
+
+    const rand = Phaser.Math.Between(0, 8);
+
+    if (rand > 5) {
+      if (!this.boosting && !this.performBoostAt) {
+        this.performBoostAt = Phaser.Math.Between(BOOST_THRESHOLD * BOOST_DELAY_RANDOMNESS, BOOST_THRESHOLD) + this.scene.time.now;
+      }
+    } else if (rand > 2) {
+      this.doManeuver();
+    } else {
+      this.target = null;
+    }
+
+    this.shouldMakeStuckDescisionAt = 0;
   }
 }

@@ -61,8 +61,8 @@ class GameScene extends BaseScene {
     this.scene.get('UiScene').updateScoreboard();
   }
 
-  getRandomGroundPosition() {
-    return this.ground.getRandomPosition();
+  getRandomGroundPosition(continent) {
+    return this.ground.getRandomPosition(continent);
   }
 
   getPlayerFromBody(body) {

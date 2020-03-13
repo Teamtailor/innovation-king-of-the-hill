@@ -92,8 +92,11 @@ export default class GroundEntity {
     return bodies[MathUtils.GetWeightedRandomIndex(bodies.map((c) => c.area))];
   }
 
-  getRandomPosition() {
-    const tile = this.getWeightedRandomBody(this.groundBodies.filter(b => b.label === 'main-ground'));
+  getRandomPosition(continent) {
+    const groundBodies = continent
+      ? this.groundBodies.filter(b => b.label === continent)
+      : this.groundBodies;
+    const tile = this.getWeightedRandomBody(groundBodies);
     const width = tile.bounds.max.x - tile.bounds.min.x;
     const height = tile.bounds.max.y - tile.bounds.min.y;
 
