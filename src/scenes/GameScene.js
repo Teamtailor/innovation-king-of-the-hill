@@ -1,5 +1,4 @@
 import BaseScene from './BaseScene';
-import PlayerEntity from '../entities/PlayerEntity';
 import AiPlayerEntity from '../entities/AiPlayerEntity';
 import GroundEntity from '../entities/GroundEntity';
 import StarBackgroundEntity from '../entities/StarBackgroundEntity';
@@ -25,8 +24,9 @@ class GameScene extends BaseScene {
 
   create(level) {
     super.create();
+    this.players = [];
 
-    this.scene.launch('UiScene');
+    this.scene.launch('UiScene', this);
 
     const escButton = this.input.keyboard.addKey('esc');
     this.adjustCamera();
@@ -50,7 +50,6 @@ class GameScene extends BaseScene {
       level
     });
 
-    this.createPlayers();
     this.powerUpService.start();
   }
 
@@ -142,78 +141,6 @@ class GameScene extends BaseScene {
     await player.die();
     this.players = this.players.filter(p => p !== player);
     player.destroy();
-  }
-
-  createPlayers() {
-    this.players = [];
-
-    this.players.push(
-      new PlayerEntity(this, {
-        image: 'rikard',
-        color: 0xffffff * Math.random(),
-        controls: {
-          up: 'up',
-          down: 'down',
-          left: 'left',
-          right: 'right',
-          boost: 'space'
-        }
-      })
-    );
-
-    this.players.push(
-      new PlayerEntity(this, {
-        image: 'anders',
-        color: 0xffffff * Math.random(),
-        controls: {
-          up: 'w',
-          left: 'a',
-          down: 's',
-          right: 'd',
-          boost: 'r'
-        },
-        useTankControls: true
-      })
-    );
-
-    this.players.push(
-      new PlayerEntity(this, {
-        image: 'adrian',
-        color: 0xffffff * Math.random(),
-        controls: {
-          boost: 'b'
-        },
-        useMouse: true
-      })
-    );
-
-    this.players.push(
-      new AiPlayerEntity(this, {
-        image: 'avatar1',
-        color: 0xff00ff
-      })
-    );
-
-    this.players.push(
-      new AiPlayerEntity(this, {
-        image: 'avatar2',
-        color: 0xff5522
-      })
-    );
-
-    this.players.push(
-      new AiPlayerEntity(this, {
-        image: 'avatar3',
-        color: 0x00ff99
-      })
-    );
-
-    this.players.push(
-      new AiPlayerEntity(this, {
-        image: 'avatar4',
-        color: 0x5500aa
-      })
-    );
   }
 
   update(time, delta) {

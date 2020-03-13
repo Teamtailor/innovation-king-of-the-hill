@@ -1,4 +1,5 @@
 import BaseScene from './BaseScene';
+import PressToJoin from '../entities/PressToJoin';
 
 class UiScene extends BaseScene {
   players = [];
@@ -18,13 +19,75 @@ class UiScene extends BaseScene {
 
   preload() {}
 
-  create() {
+  create(gameScene) {
+    this.gameScene = gameScene;
+
     super.create();
     this.crown = this.add.image(0, 0, 'crown');
     this.crown.setScale(0.2);
     this.crown.setRotation((18 * Math.PI) / 180);
     this.created = true;
     this.updateScoreboard();
+    this.createJoinButtons();
+  }
+
+  createJoinButtons() {
+    const join1 = new PressToJoin(this, this.gameScene, {
+      text: 'PRESS SPACE TO JOIN',
+      image: 'rikard',
+      color: 0xffffff * Math.random(),
+      controls: {
+        up: 'up',
+        down: 'down',
+        left: 'left',
+        right: 'right',
+        boost: 'space'
+      },
+      joinButton: 'space'
+    });
+    join1.label.setOrigin(0, 0.5);
+    join1.label.setPosition(150, 50);
+
+    const join2 = new PressToJoin(this, this.gameScene, {
+      text: 'PRESS Q TO JOIN',
+      image: 'anders',
+      color: 0xffffff * Math.random(),
+      controls: {
+        up: 'w',
+        down: 's',
+        left: 'a',
+        right: 'd',
+        boost: 'q'
+      },
+      joinButton: 'q'
+    });
+    join2.label.setOrigin(0.5);
+    join2.label.setPosition(this.game.config.width / 2, 50);
+
+    const join3 = new PressToJoin(this, this.gameScene, {
+      text: 'PRESS B TO JOIN (MOUSE)',
+      image: 'adrian',
+      color: 0xffffff * Math.random(),
+      controls: {
+        boost: 'b'
+      },
+      useMouse: true,
+      joinButton: 'b'
+    });
+    join3.label.setOrigin(1, 0.5);
+    join3.label.setPosition(this.game.config.width - 150, 50);
+
+    const join4 = new PressToJoin(this, this.gameScene, {
+      text: 'PRESS + TO ADD AI PLAYER',
+      useAi: true,
+      joinButton: 'plus',
+      maxAdd: 4
+    });
+    join4.label.setOrigin(1, 0.5);
+    join4.label.setPosition(
+      this.game.config.width - 150,
+      this.game.config.height - 20
+    );
   }
 
   updateScoreboard() {
@@ -41,6 +104,10 @@ class UiScene extends BaseScene {
     this.powerUps.forEach(pu => {
       pu.destroy();
     });
+
+    if (!this.players.length) {
+      return;
+    }
 
     const [currentLeader] = this.players.filter(p => p.leader);
     const allPoints = this.players.map(p => p.points);
