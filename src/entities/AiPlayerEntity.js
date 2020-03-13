@@ -34,7 +34,7 @@ export default class AiPlayerEntity extends PlayerEntity {
 
   updateTarget(time) {
     if (this.shouldGetNewTarget()) {
-      this.setTarget(Math.random() > 0.3333 ? this.findClosestTarget() : this.findSomeTarget(), time);
+      this.setTarget(Math.random() < 0.2 ? this.findSomeTarget() : this.findSuitableTarget(), time);
     } else if (this.tiredOfChasing(time)) {
       this.setTarget(this.findSomeTarget(), time);
     }
@@ -75,12 +75,20 @@ export default class AiPlayerEntity extends PlayerEntity {
     this.matterObj.applyForce(force);
   }
 
-  getPossibleTargets() {
-    return this.scene.players.filter(player => (player.isAlive && player.id !== this.id));
+  getPossibleTargets(onSameContinent = false) {
+    const targets = this.scene.players.filter(player => (player.isAlive && player.id !== this.id));
+    if (!onSameContinent) {
+      return targets;
+    }
+    const myGrounds = this.grounds.map(g => g.label);
+    return targets.filter((player) => {
+      const playerGrounds = player.grounds.map(g => g.label);
+      return myGrounds.some(r => playerGrounds.includes(r));
+    });
   }
 
-  findClosestTarget() {
-    const possibleTargets = this.getPossibleTargets();
+  findSuitableTarget() {
+    const possibleTargets = this.getPossibleTargets(true);
     if (possibleTargets.length === 0) {
       return null;
     }
