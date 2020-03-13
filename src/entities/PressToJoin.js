@@ -7,19 +7,23 @@ export default class PressToJoin {
   aiConfigs = [
     {
       image: 'avatar1',
-      color: 0xff00ff
+      color: 0xff00ff,
+      autoJump: true
     },
     {
       image: 'avatar2',
-      color: 0xff5522
+      color: 0xff5522,
+      autoJump: true
     },
     {
       image: 'avatar3',
-      color: 0x00ff99
+      color: 0x00ff99,
+      autoJump: true
     },
     {
       image: 'avatar4',
-      color: 0x5500aa
+      color: 0x5500aa,
+      autoJump: true
     }
   ];
 

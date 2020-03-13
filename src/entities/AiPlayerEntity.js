@@ -106,7 +106,8 @@ export default class AiPlayerEntity extends PlayerEntity {
 
     if (this.shouldPerformBoost()) {
       const direction = Phaser.Math.Between(BOOST_DIRECTION_MIN, BOOST_DIRECTION_MAX) * Math.random() < 0.5 ? 1 : -1;
-      this.applyBoost(force, this.boostUp(), direction);
+      this.boostUp();
+      this.applyBoost(force, direction);
       this.performBoostAt = null;
       this.lastBoostTime = this.scene.time.now;
       this.matterObj.setAngularVelocity(Math.random() * 40 - 20);

@@ -32,7 +32,8 @@ export const COLLISION_CATEGORIES = {
   DEFAULT: 0x01,
   GROUND: 0x02,
   PLAYER: 0x04,
-  POWER_UP: 0x08
+  POWER_UP: 0x08,
+  PLAYER_SENSOR: 0x10
 };
 
 export const DEPTHS = {

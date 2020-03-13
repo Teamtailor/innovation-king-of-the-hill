@@ -33,12 +33,14 @@ export default class PlayerEntity {
       controls,
       useMouse,
       useTankControls,
-      follow
+      follow,
+      autoJump
     }
   ) {
     this.scene = scene;
     this.useMouse = useMouse;
     this.useTankControls = useTankControls;
+    this.autoJump = autoJump;
     this.id = scene.generateId();
 
     this.matterObj = scene.matter.add.image(-1000, -1000, 'transparent', null, {
@@ -48,6 +50,8 @@ export default class PlayerEntity {
         radius: 240
       }
     });
+
+    this.createSensors();
 
     this.matterObj.setCollisionCategory(COLLISION_CATEGORIES.PLAYER);
     this.matterObj.setCollidesWith(0); // nothing until we have spawned
@@ -63,6 +67,76 @@ export default class PlayerEntity {
 
     if (follow) {
       scene.followObject(this.matterObj);
+    }
+  }
+
+  edgeSensor = null;
+  edgeSensorConstraint = null;
+  edgeSensorGrounds = 0;
+
+  jumpSensor = null;
+  jumpSensorConstraint = null;
+  jumpSensorGrounds = 0;
+
+  createEdgeSensor() {
+    this.edgeSensor = this.scene.matter.add.circle(0, 0, 10, {
+      isSensor: true,
+      collisionFilter: {
+        category: COLLISION_CATEGORIES.PLAYER_SENSOR,
+        mask: COLLISION_CATEGORIES.GROUND
+      },
+      density: 0.00000000001
+    });
+
+    this.edgeSensor.onCollideCallback = () => {
+      this.edgeSensorGrounds += 1;
+    };
+
+    this.edgeSensor.onCollideEndCallback = () => {
+      this.edgeSensorGrounds -= 1;
+      if (!this.edgeSensorGrounds && this.jumpSensorGrounds) {
+        this.boostUp();
+      }
+    };
+
+    this.edgeSensorConstraint = this.scene.matter.add.constraint(
+      this.matterObj,
+      this.edgeSensor,
+      0,
+      1
+    );
+  }
+
+  createJumpSensor() {
+    this.jumpSensor = this.scene.matter.add.rectangle(0, 0, 100, 10, {
+      isSensor: true,
+      collisionFilter: {
+        category: COLLISION_CATEGORIES.PLAYER_SENSOR,
+        mask: COLLISION_CATEGORIES.GROUND
+      },
+      density: 0.00000000001
+    });
+
+    this.jumpSensor.onCollideCallback = () => {
+      this.jumpSensorGrounds += 1;
+    };
+
+    this.jumpSensor.onCollideEndCallback = () => {
+      this.jumpSensorGrounds -= 1;
+    };
+
+    this.jumpSensorConstraint = this.scene.matter.add.constraint(
+      this.matterObj,
+      this.jumpSensor,
+      0,
+      1
+    );
+  }
+
+  createSensors() {
+    if (this.autoJump) {
+      this.createEdgeSensor();
+      this.createJumpSensor();
     }
   }
 
@@ -129,48 +203,9 @@ export default class PlayerEntity {
           );
 
         this.matterObj.applyForce(force);
-
-        if (boost) {
-          const boostForce = new Phaser.Math.Vector2(force)
-            .normalize()
-            .multiply(new Phaser.Math.Vector2(boost, boost));
-
-          this.matterObj.applyForce(boostForce);
-        }
+        return force;
       }
     }
-  }
-
-  readTankControls(delta, boost) {
-    const {
-      up = {}, down = {}, left = {}, right = {}
-    } = this.keys;
-
-    let thrust = 0;
-
-    if (up.isDown) {
-      thrust += this.applySpeedModifiers(GAME_CONFIG.DEFAULT_SPEED);
-    }
-    if (down.isDown) {
-      thrust += this.applySpeedModifiers(-GAME_CONFIG.DEFAULT_SPEED);
-    }
-    if (left.isDown && !this.boosting) {
-      this.matterObj.setAngularVelocity(-0.1);
-    }
-    if (right.isDown && !this.boosting) {
-      this.matterObj.setAngularVelocity(0.1);
-    }
-
-    if (boost) {
-      if (up.isDown) {
-        thrust += boost;
-      }
-      if (down.isDown) {
-        thrust += -boost;
-      }
-    }
-
-    this.matterObj.thrustLeft(thrust);
   }
 
   readPushControls(delta, boost) {
@@ -214,23 +249,25 @@ export default class PlayerEntity {
     }
 
     this.matterObj.applyForce(force);
-    this.applyBoost(force, boost);
+    return force;
   }
 
-  applyBoost(force, boost, degrees = 0) {
-    if (boost) {
-      const boostVector = degrees === 0
-        ? new Phaser.Math.Vector2(boost, boost)
-        : Phaser.Physics.Matter.Matter.Vector.rotate(
-          new Phaser.Math.Vector2(boost, boost),
-          Phaser.Math.DegToRad(degrees)
-        );
+  applyBoost(force, degrees = 0) {
+    if (this.boost) {
+      const boostVector =
+        degrees === 0
+          ? new Phaser.Math.Vector2(this.boost, this.boost)
+          : Phaser.Physics.Matter.Matter.Vector.rotate(
+            new Phaser.Math.Vector2(this.boost, this.boost),
+            Phaser.Math.DegToRad(degrees)
+          );
 
       const boostForce = new Phaser.Math.Vector2(force)
         .normalize()
         .multiply(boostVector);
 
       this.matterObj.applyForce(boostForce);
+      this.boost = null;
     }
   }
 
@@ -243,10 +280,8 @@ export default class PlayerEntity {
       this.chargingBoost = true;
     }
     if (boost.isUp && this.chargingBoost) {
-      return this.boostUp();
+      this.boostUp();
     }
-
-    return 0;
   }
 
   boostUp() {
@@ -270,7 +305,7 @@ export default class PlayerEntity {
     });
 
     this.fatigue += this.fatigue < 1 - 0.2 ? 0.2 : 1 - this.fatigue;
-    return 0.5 * this.availableStrength;
+    this.boost = 0.5 * this.availableStrength;
   }
 
   readController(delta) {
@@ -283,14 +318,10 @@ export default class PlayerEntity {
       return;
     }
 
-    const boost = this.readBoost(delta);
-
     if (this.useMouse) {
-      this.readMouse(delta, boost);
-    } else if (this.useTankControls) {
-      this.readTankControls(delta, boost);
+      return this.readMouse(delta);
     } else {
-      this.readPushControls(delta, boost);
+      return this.readPushControls(delta);
     }
   }
 
@@ -470,10 +501,45 @@ export default class PlayerEntity {
     return !!this.grounds.length;
   }
 
+  rotateSensors() {
+    if (!this.jumpSensor) {
+      return;
+    }
+
+    const velocity = new Phaser.Math.Vector2(this.matterObj.body.velocity);
+
+    if (velocity.length() > 2) {
+      const angle = velocity.angle();
+      const rotation = Phaser.Physics.Matter.Matter.Vector.rotate(
+        {
+          x: 1,
+          y: 0
+        },
+        angle
+      );
+
+      this.edgeSensorConstraint.pointA = {
+        x: rotation.x * 26,
+        y: rotation.y * 26
+      };
+
+      this.jumpSensorConstraint.pointA = {
+        x: rotation.x * 100,
+        y: rotation.y * 100
+      };
+
+      this.jumpSensor.angle = angle;
+    }
+  }
+
   update(time, delta) {
+    this.rotateSensors();
     this.updateAvailableStrength(delta);
     this.updateMask();
-    this.readController(delta);
+
+    this.readBoost();
+    const force = this.readController(delta);
+    this.applyBoost(force);
   }
 
   addPowerUp(powerUp) {

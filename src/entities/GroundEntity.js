@@ -32,7 +32,7 @@ export default class GroundEntity {
 
     this.sprite.setCollisionCategory(COLLISION_CATEGORIES.GROUND);
     this.sprite.setCollidesWith(
-      COLLISION_CATEGORIES.POWER_UP | COLLISION_CATEGORIES.PLAYER
+      COLLISION_CATEGORIES.POWER_UP | COLLISION_CATEGORIES.PLAYER | COLLISION_CATEGORIES.PLAYER_SENSOR
     );
 
     this.prepareContinentData();
