@@ -65,36 +65,36 @@ class BootScene extends Phaser.Scene {
       'NewGameButton',
       'assets/images/buttons/menu/ng.png',
       {
-        frameWidth: 620,
-        frameHeight: 200
+        frameWidth: 954,
+        frameHeight: 416
       }
     );
     this.load.spritesheet(
       'ResumeGameButton',
       'assets/images/buttons/menu/rg.png',
       {
-        frameWidth: 620,
-        frameHeight: 200
+        frameWidth: 954,
+        frameHeight: 416
       }
     );
     this.load.spritesheet('RulesButton', 'assets/images/buttons/menu/rs.png', {
-      frameWidth: 620,
-      frameHeight: 200
+      frameWidth: 954,
+      frameHeight: 416
     });
     this.load.spritesheet(
       'ScoreboardButton',
       'assets/images/buttons/menu/sb.png',
       {
-        frameWidth: 620,
-        frameHeight: 200
+        frameWidth: 954,
+        frameHeight: 416
       }
     );
     this.load.spritesheet(
       'BackToMenuButton',
       'assets/images/buttons/menu/btm.png',
       {
-        frameWidth: 620,
-        frameHeight: 200
+        frameWidth: 830,
+        frameHeight: 318
       }
     );
 

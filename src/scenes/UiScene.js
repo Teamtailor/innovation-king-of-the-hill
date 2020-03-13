@@ -89,8 +89,8 @@ class UiScene extends BaseScene {
     playerAvatar.setScale(0.1);
 
     const fontStyle = {
-      fontFamily: 'Pixeled',
-      fontSize: 12,
+      fontFamily: 'LatoBold',
+      fontSize: 20,
       color: '#ffffff'
     };
 

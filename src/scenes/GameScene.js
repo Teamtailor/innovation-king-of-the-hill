@@ -78,8 +78,8 @@ class GameScene extends BaseScene {
       return;
     }
     let label = this.add.text(x, y, text, {
-      fontFamily: 'Pixeled',
-      fontSize: 14,
+      fontFamily: 'LatoBold',
+      fontSize: 20,
       color: '#ffbe00'
     });
     label.setOrigin(0.5);

@@ -11,32 +11,35 @@ class RulesScene extends BaseScene {
 
   create() {
     super.create();
-    this.add.image(-110, -50, 'MenuBackground').setOrigin(0).setScale(1.7);
+    this.add
+      .image(-300, 0, 'MenuBackground')
+      .setOrigin(0)
+      .setScale(0.5);
 
-    const rulesInfoHolderRect = new Phaser.Geom.Rectangle(232, 202, 796, 426);
+    const rulesInfoHolderRect = new Phaser.Geom.Rectangle(232, 302, 796, 426);
     const rulesInfoHolderGraphics = this.add.graphics({
       fillStyle: {
-        color: 0x183274,
-        alpha: 0.8
+        color: 0x872268,
+        alpha: 0.9
       }
     });
     
     rulesInfoHolderGraphics.fillRectShape(rulesInfoHolderRect);
     this.add.graphics(rulesInfoHolderGraphics);
 
-    this.add.text(590, 250, 'Rules', {
-      fontFamily: 'Pixeled',
-      fontSize: 20,
+    this.add.text(590, 350, 'Rules', {
+      fontFamily: 'LatoBold',
+      fontSize: 40,
       color: '#ffffff'
     });
 
-    this.add.text(300, 330, 'Using the mouse, arrow, or keys (w, s, a, d)\nTry to throw your opponent into the abyss.\nCollect upgrades before others catch them.', {
-      fontFamily: 'Pixeled',
-      fontSize: 18,
+    this.add.text(300, 430, 'Using the mouse, arrow, or keys (w, s, a, d)\nTry to throw your opponent into the abyss.\nCollect upgrades before others catch them.', {
+      fontFamily: 'LatoBold',
+      fontSize: 35,
       color: '#ffffff'
     });
 
-    this.backToMenuButton = this.add.sprite(630, 530, 'BackToMenuButton', 0).setInteractive({
+    this.backToMenuButton = this.add.sprite(630, 630, 'BackToMenuButton', 0).setInteractive({
       cursor: 'pointer'
     });
 

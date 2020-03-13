@@ -30,40 +30,29 @@ class MainMenuScene extends BaseScene {
     const buttons = [];
 
     this.add
-      .image(-110, -50, 'MenuBackground')
+      .image(-300, 0, 'MenuBackground')
       .setOrigin(0)
-      .setScale(1.7);
+      .setScale(0.5);
 
     this.drawActiveUsers();
 
-    const menuHolderRect = new Phaser.Geom.Rectangle(232, 202, 346, 426);
-    const menuHolderGraphics = this.add.graphics({
-      fillStyle: {
-        color: 0xffffff,
-        alpha: 0.8
-      }
-    });
-
-    menuHolderGraphics.fillRectShape(menuHolderRect);
-    this.add.graphics(menuHolderGraphics);
-
     buttons.push(
-      this.add.sprite(400, 270, 'NewGameButton', 0).setInteractive({
+      this.add.sprite(400, 370, 'NewGameButton', 0).setInteractive({
         cursor: 'pointer'
       })
     );
     buttons.push(
-      this.add.sprite(400, 370, 'ResumeGameButton', 0).setInteractive({
+      this.add.sprite(400, 470, 'ResumeGameButton', 0).setInteractive({
         cursor: 'pointer'
       })
     );
     buttons.push(
-      this.add.sprite(400, 470, 'RulesButton', 0).setInteractive({
+      this.add.sprite(400, 570, 'RulesButton', 0).setInteractive({
         cursor: 'pointer'
       })
     );
     buttons.push(
-      this.add.sprite(400, 570, 'ScoreboardButton', 0).setInteractive({
+      this.add.sprite(400, 670, 'ScoreboardButton', 0).setInteractive({
         cursor: 'pointer'
       })
     );
@@ -117,13 +106,13 @@ class MainMenuScene extends BaseScene {
   }
 
   drawActiveUsers() {
-    const activeUsersRect = new Phaser.Geom.Rectangle(682, 202, 346, 426);
-    const line = new Phaser.Geom.Line(760, 300, 950, 300);
+    const activeUsersRect = new Phaser.Geom.Rectangle(682, 302, 346, 426);
+    const line = new Phaser.Geom.Line(760, 400, 950, 400);
 
     const activeUsersGraphics = this.add.graphics({
       fillStyle: {
-        color: 0x183274,
-        alpha: 0.8
+        color: 0x872268,
+        alpha: 0.9
       }
     });
 
@@ -132,9 +121,21 @@ class MainMenuScene extends BaseScene {
     activeUsersGraphics.lineStyle(2, 0xffffff);
     activeUsersGraphics.strokeLineShape(line);
 
-    this.add.text(750, 250, 'Players online now', {
-      fontFamily: 'Pixeled',
-      fontSize: 14,
+    this.add.text(750, 350, 'Players online now', {
+      fontFamily: 'LatoBold',
+      fontSize: 25,
+      color: '#ffffff'
+    });
+
+    this.add.text(730, 450, 'Levels', {
+      fontFamily: 'LatoBold',
+      fontSize: 25,
+      color: '#ffffff'
+    });
+
+    this.add.text(880, 450, 'Players', {
+      fontFamily: 'LatoBold',
+      fontSize: 25,
       color: '#ffffff'
     });
 
@@ -143,29 +144,18 @@ class MainMenuScene extends BaseScene {
 
   drawUsersList(maxPlayersCount, players) {
     let printedUsersCount = 0;
-    let printStartPositionY = 400;
+    let printStartPositionY = 500;
     const printStartPositionX = 760;
-    const tableSpace = 150;
+    const tableSpace = 130;
     
     this.clearPlayersList();
-
-    this.add.text(730, 350, 'Levels', {
-      fontFamily: 'Pixeled',
-      fontSize: 15,
-      color: '#ffffff'
-    });
-    this.add.text(880, 350, 'Players', {
-      fontFamily: 'Pixeled',
-      fontSize: 15,
-      color: '#ffffff'
-    });
 
     players.map(player => {
       const playerElement = {};
       if (printedUsersCount < maxPlayersCount) {
         playerElement.level = this.add.text(printStartPositionX, printStartPositionY, player.level, {
-          fontFamily: 'Pixeled',
-          fontSize: 15,
+          fontFamily: 'LatoBold',
+          fontSize: 25,
           color: '#ffffff'
         });
         playerElement.name = this.add.text(
@@ -173,8 +163,8 @@ class MainMenuScene extends BaseScene {
           printStartPositionY,
           player.name,
           {
-            fontFamily: 'Pixeled',
-            fontSize: 15,
+            fontFamily: 'LatoBold',
+            fontSize: 25,
             color: '#ffffff'
           }
         );
