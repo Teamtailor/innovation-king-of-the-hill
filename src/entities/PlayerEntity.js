@@ -527,13 +527,13 @@ export default class PlayerEntity {
       );
 
       this.edgeSensorConstraint.pointA = {
-        x: rotation.x * 10,
-        y: rotation.y * 10
+        x: rotation.x * -8,
+        y: rotation.y * -8
       };
 
       this.jumpSensorConstraint.pointA = {
-        x: rotation.x * 100,
-        y: rotation.y * 100
+        x: rotation.x * 80,
+        y: rotation.y * 80
       };
 
       this.jumpSensor.angle = this.velocityAngle;
