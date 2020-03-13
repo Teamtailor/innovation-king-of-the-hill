@@ -1,6 +1,7 @@
 import {
   COLLISION_CATEGORIES, DEPTHS
 } from '../config/constants';
+import MathUtils from '../utils/Math';
 
 const POINT_EDGE_MARGIN = 25;
 
@@ -87,17 +88,8 @@ export default class GroundEntity {
     this.continents = Object.values(continents);
   }
 
-  getWeightedRandomIndex(values) {
-    const sum = values.reduce((a, b) => a + b, 0);
-    const rand = Phaser.Math.Between(0, sum);
-    return values.map(((sum) => (value) => {
-      sum += value;
-      return sum;
-    })(0)).filter((el) => rand >= el).length;
-  }
-
   getWeightedRandomBody(bodies) {
-    return bodies[this.getWeightedRandomIndex(bodies.map((c) => c.area))];
+    return bodies[MathUtils.GetWeightedRandomIndex(bodies.map((c) => c.area))];
   }
 
   getRandomPosition() {

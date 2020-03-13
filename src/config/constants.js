@@ -42,28 +42,32 @@ export const POWER_UP_CONFIG = {
       label: 'FED UP!',
       duration: 4000,
       svgScale: 0.2,
-      svgAsset: 'pizza'
+      svgAsset: 'pizza',
+      weight: 8
     },
     [Slip.name]: {
       PowerUpClass: Slip,
       label: 'SLIPPIN\'',
       duration: 200,
       svgScale: 0.2,
-      svgAsset: 'banana'
+      svgAsset: 'banana',
+      weight: 4
     },
     [SpeedUp.name]: {
       PowerUpClass: SpeedUp,
       label: 'SPEED UP!',
       duration: 2500,
       svgScale: 0.08,
-      svgAsset: 'soda-can'
+      svgAsset: 'soda-can',
+      weight: 6
     },
     [Drunk.name]: {
       PowerUpClass: Drunk,
       label: 'FEELING DIZZY',
       duration: 3000,
       svgScale: 0.18,
-      svgAsset: 'cocktail'
+      svgAsset: 'cocktail',
+      weight: 5
     }
   }
 };

@@ -1,14 +1,17 @@
 import {
   POWER_UP_CONFIG
 } from '../config/constants';
+import MathUtils from '../utils/Math';
 
 export default class PowerUpService {
   nextSpawnTime = 0;
   lastSpawn = 0;
+  powerUpWeights = [];
 
   constructor(scene) {
     this.scene = scene;
     this.powerUpConfigTypes = Object.values(POWER_UP_CONFIG.TYPES);
+    this.powerUpWeights = this.powerUpConfigTypes.map((type) => type.weight);
   }
 
   preload() {
@@ -34,7 +37,7 @@ export default class PowerUpService {
     const {
       x, y
     } = this.scene.getRandomGroundPosition();
-    const index = Phaser.Math.Between(0, this.powerUpConfigTypes.length - 1);
+    const index = MathUtils.GetWeightedRandomIndex(this.powerUpWeights);
     return new this.powerUpConfigTypes[index].PowerUpClass(
       this.scene,
       x,
