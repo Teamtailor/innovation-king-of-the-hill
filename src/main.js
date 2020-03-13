@@ -24,7 +24,8 @@ const config = {
         y: 0
       },
       debug: {
-        showVelocity: true
+        showVelocity: true,
+        showBody: true
       }
     }
   },

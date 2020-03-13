@@ -2,11 +2,13 @@ import {
   COLLISION_CATEGORIES, DEPTHS
 } from '../config/constants';
 
-const GROUND_POSITION_MARGIN = 30;
+const POINT_EDGE_MARGIN = 25;
 
 export default class GroundEntity {
   sprite = null;
   scene = null;
+  continents = [];
+  groundBodies = [];
 
   constructor({
     scene, onCollideCallback, onCollideEndCallback, level
@@ -27,63 +29,87 @@ export default class GroundEntity {
 
     this.sprite.setDepth(DEPTHS.GROUND);
 
-    // this needed to be done because of a bug when importing shape from PhysicsEditor (cant set regular callback)
-    this.scene.matter.world.on('collisionstart', function(event) {
-      for (var i = 0; i < event.pairs.length; i++) {
-        const pair = event.pairs[i];
-
-        if (pair.bodyA.label === 'ground') {
-          onCollideCallback(pair);
-        }
-      }
-    });
-
-    this.scene.matter.world.on('collisionend', function(event) {
-      for (var i = 0; i < event.pairs.length; i++) {
-        const pair = event.pairs[i];
-
-        if (pair.bodyA.label === 'ground') {
-          onCollideEndCallback(pair);
-        }
-      }
-    });
-
     this.sprite.setCollisionCategory(COLLISION_CATEGORIES.GROUND);
     this.sprite.setCollidesWith(
       COLLISION_CATEGORIES.POWER_UP | COLLISION_CATEGORIES.PLAYER
     );
+
+    this.prepareContinentData();
+    this.groundBodies.forEach((groundBody) => {
+      groundBody.collisionFilter.category = COLLISION_CATEGORIES.GROUND;
+      groundBody.collisionFilter.mask = COLLISION_CATEGORIES.POWER_UP | COLLISION_CATEGORIES.PLAYER;
+      groundBody.onCollideCallback = onCollideCallback;
+      groundBody.onCollideEndCallback = onCollideEndCallback;
+    });
+
+    if (this.sprite.world.debugConfig.showBody) {
+      this.debugPrintDropZones();
+    }
   }
 
-  pointIsOnGround(x, y) {
-    const bodies = this.scene.matter.world.getAllBodies();
-    const groundBodies = bodies.filter(b => b.label === 'ground');
-    const isOnGround = !!this.scene.matter.query.point(groundBodies, {
-      x,
-      y
-    }).length;
+  debugPrintDropZones() {
+    this.groundBodies.forEach((groundBody) => {
+      const width = groundBody.bounds.max.x - groundBody.bounds.min.x;
+      const height = groundBody.bounds.max.y - groundBody.bounds.min.y;
 
-    return isOnGround;
+      this.scene.matter.add.rectangle(
+        groundBody.position.x,
+        groundBody.position.y,
+        width - POINT_EDGE_MARGIN * 2,
+        height - POINT_EDGE_MARGIN * 2,
+        {
+          isStatic: true,
+          render: {
+            lineColor: 0xFF00CC
+          }
+        }
+      );
+    });
+  }
+
+  prepareContinentData() {
+    const continents = {};
+    this.groundBodies = [];
+    this.sprite.body.parts.filter(part => part.id !== this.sprite.body.id)
+      .forEach((part) => {
+        if (!continents[part.label]) {
+          continents[part.label] = {
+            area: 0,
+            label: part.label,
+            parts: []
+          };
+        }
+        continents[part.label].parts.push(part);
+        continents[part.label].area += part.area;
+        this.groundBodies.push(part);
+      });
+
+    this.continents = Object.values(continents);
+  }
+
+  getWeightedRandomIndex(values) {
+    const sum = values.reduce((a, b) => a + b, 0);
+    const rand = Phaser.Math.Between(0, sum);
+    return values.map(((sum) => (value) => {
+      sum += value;
+      return sum;
+    })(0)).filter((el) => rand >= el).length;
+  }
+
+  getWeightedRandomBody(bodies) {
+    return bodies[this.getWeightedRandomIndex(bodies.map((c) => c.area))];
   }
 
   getRandomPosition() {
-    const {
-      x, y, width, height
-    } = this.sprite.getBounds();
+    const tile = this.getWeightedRandomBody(this.groundBodies);
+    const width = tile.bounds.max.x - tile.bounds.min.x;
+    const height = tile.bounds.max.y - tile.bounds.min.y;
 
-    const rect = new Phaser.Geom.Rectangle(
-      x + GROUND_POSITION_MARGIN,
-      y + GROUND_POSITION_MARGIN,
-      width - GROUND_POSITION_MARGIN * 2,
-      height - GROUND_POSITION_MARGIN * 2
-    );
-
-    let point = rect.getRandomPoint();
-
-    // give this 20 tries to not lock the process
-    for (var i = 0; !this.pointIsOnGround(point.x, point.y) && i < 20; i++) {
-      point = rect.getRandomPoint();
-    }
-
-    return point;
+    return (new Phaser.Geom.Rectangle(
+      tile.position.x - width / 2,
+      tile.position.y - height / 2,
+      width - POINT_EDGE_MARGIN * 2,
+      height - POINT_EDGE_MARGIN * 2,
+    )).getRandomPoint();
   }
 }
