@@ -445,7 +445,7 @@ export default class AiPlayerEntity extends PlayerEntity {
 
     const rand = Phaser.Math.Between(0, 8);
 
-    if (rand > 5) {
+    if (rand > 6) {
       if (!this.boosting && !this.performBoostAt) {
         this.performBoostAt = Phaser.Math.Between(
           STUCK_BOOST_THRESHOLD * STUCK_BOOST_DELAY_RANDOMNESS,
