@@ -5,7 +5,7 @@ import MathUtils from '../utils/Math';
 
 export default class PowerUpService {
   nextSpawnTime = 0;
-  lastSpawn = 0;
+  lastSpawn = Phaser.Math.MAX_SAFE_INTEGER;
   available = [];
   powerUpWeights = [];
 
@@ -24,6 +24,7 @@ export default class PowerUpService {
   }
 
   start() {
+    this.lastSpawn = this.scene.time.now;
     this.setSpawnTime();
   }
 

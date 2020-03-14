@@ -1,5 +1,4 @@
 import BaseScene from './BaseScene';
-import AiPlayerEntity from '../entities/AiPlayerEntity';
 import GroundEntity from '../entities/GroundEntity';
 import StarBackgroundEntity from '../entities/StarBackgroundEntity';
 import PowerUpService from '../services/PowerUpService';
@@ -49,8 +48,6 @@ class GameScene extends BaseScene {
       onCollideEndCallback: this.leavingGround.bind(this),
       level
     });
-
-    this.powerUpService.start();
   }
 
   addPlayerToScoreBoard(player) {

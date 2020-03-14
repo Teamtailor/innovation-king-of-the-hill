@@ -73,6 +73,10 @@ export default class PressToJoin {
       }
       this.stopBlinking();
       this.label.setAlpha(0);
+
+      if (this.players.length === 1) {
+        gameScene.powerUpService.start();
+      }
     });
   }
 
