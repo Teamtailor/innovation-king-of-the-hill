@@ -21,7 +21,7 @@ export const GAME_CONFIG = {
     TARGET_TIREDNESS_TIME_MIN: 2500,
     TARGET_TIREDNESS_TIME_MAX: 4300,
     AI_STUCK_LIMIT: 750,
-    STUCK_BOOST_THRESHOLD: 1000,
+    STUCK_BOOST_THRESHOLD: 450,
     STUCK_BOOST_DELAY_RANDOMNESS: 0.3,
     BOOST_DIRECTION_MIN: 65, // degrees
     BOOST_DIRECTION_MAX: 140, // degrees
@@ -32,7 +32,9 @@ export const GAME_CONFIG = {
     RANDOM_BOOST_LIKELINESS: 0.3,
     DEFAULT_REACTION_TIME: 14, // update runloops
     REACTION_SPEED_RANDOMNESS: 0.5,
-    AI_TARGET_DISTANCE_HISTORY: 50
+    AI_TARGET_DISTANCE_HISTORY: 50,
+    WEIRD_REVERSED_MOVE_MIN: 200,
+    WEIRD_REVERSED_MOVE_MAX: 500
   }
 };
 
@@ -62,6 +64,7 @@ export const POWER_UP_CONFIG = {
   TYPES: {
     [Grow.name]: {
       PowerUpClass: Grow,
+      name: 'Grow',
       label: 'FED UP!',
       duration: 4000,
       svgScale: 0.2,
@@ -70,6 +73,7 @@ export const POWER_UP_CONFIG = {
     },
     [Slip.name]: {
       PowerUpClass: Slip,
+      name: 'Slip',
       label: 'SLIPPIN\'',
       duration: 200,
       svgScale: 0.2,
@@ -78,6 +82,7 @@ export const POWER_UP_CONFIG = {
     },
     [SpeedUp.name]: {
       PowerUpClass: SpeedUp,
+      name: 'SpeedUp',
       label: 'SPEED UP!',
       duration: 2500,
       svgScale: 0.08,
@@ -86,6 +91,7 @@ export const POWER_UP_CONFIG = {
     },
     [Drunk.name]: {
       PowerUpClass: Drunk,
+      name: 'Drunk',
       label: 'FEELING DIZZY',
       duration: 3000,
       svgScale: 0.18,

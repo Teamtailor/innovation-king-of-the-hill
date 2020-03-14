@@ -22,7 +22,9 @@ const {
   RANDOM_BOOST_DISTANCE_MODIFER,
   RANDOM_BOOST_TIME_MIN,
   RANDOM_BOOST_TIME_MAX,
-  RANDOM_BOOST_LIKELINESS
+  RANDOM_BOOST_LIKELINESS,
+  WEIRD_REVERSED_MOVE_MIN,
+  WEIRD_REVERSED_MOVE_MAX
 } = GAME_CONFIG.AI;
 
 export default class AiPlayerEntity extends PlayerEntity {
@@ -37,11 +39,13 @@ export default class AiPlayerEntity extends PlayerEntity {
   lastMoveVector = null;
   shouldUpdateReactionTimeAt = 0;
   shouldMakeStuckDescisionAt = 0;
+  stopDoingWeirdReverseMoveAt = 0;
   performRandomBoost = false;
   nextRandomBoostPerformAt = 0;
   nextRandomBoostDistanceThreshold = DEFAULT_RANDOM_BOOST_DISTANCE;
   currentReactionTime = DEFAULT_REACTION_TIME;
   aiTargetDistances = [];
+  aiTargetDistancesModifer = 0;
 
   maneuverStartTime = 0;
   maneuverTime = 0;
@@ -62,9 +66,18 @@ export default class AiPlayerEntity extends PlayerEntity {
       this.updateReactionTime(time);
       this.updateTargetDistances(time);
       this.updateManeuver(time);
-      this.updateRandomBoost(time);
+      this.updateWeirdReverseMove(time);
+      // this.updateRandomBoost(time);
       this.move(time);
     }
+  }
+
+  updateWeirdReverseMove(time) {
+    if (time < this.stopDoingWeirdReverseMoveAt) {
+      return;
+    }
+    this.stopDoingWeirdReverseMoveAt = 0;
+    this.reverseControls = this.hasPowerUp('Drunk');
   }
 
   updateRandomBoost(time) {
@@ -127,6 +140,7 @@ export default class AiPlayerEntity extends PlayerEntity {
     super.spawn();
     this.resetManeuver();
     this.setRandomBoostVars();
+    this.setRandomAiTargetDistancesModifer();
 
     this.escapeTo = null;
     this.target = null;
@@ -134,6 +148,11 @@ export default class AiPlayerEntity extends PlayerEntity {
     this.currentReactionTime = DEFAULT_REACTION_TIME;
     this.shouldUpdateReactionTimeAt = 0;
     this.shouldMakeStuckDescisionAt = 0;
+    this.stopDoingWeirdReverseMoveAt = 0;
+  }
+
+  setRandomAiTargetDistancesModifer() {
+    this.aiTargetDistancesModifer = Phaser.Math.Between(0, 20);
   }
 
   onCliffAhead() {
@@ -217,11 +236,39 @@ export default class AiPlayerEntity extends PlayerEntity {
       return this.target.getPosition();
     }
 
-    if (this.isTargetAiPlayer() && this.notCatchingUp() && Math.random() < 0.10) {
-      return this.doManeuver(time);
-    } else {
-      return this.target.getPreviousPosition(this.currentReactionTime);
+    if (this.shouldTrySomething()) {
+      const rand = Phaser.Math.Between(0, 2);
+      if (rand === 0) {
+        this.reverseControls = true;
+        this.aiTargetDistances = [];
+        this.stopDoingWeirdReverseMoveAt = time + Phaser.Math.Between(WEIRD_REVERSED_MOVE_MIN, WEIRD_REVERSED_MOVE_MAX);
+        return this.target.getPosition();
+      } else if (rand === 1) {
+        this.performRandomBoost = true;
+        return this.target.getPosition();
+      } else {
+        return this.doManeuver(time);
+      }
     }
+
+    return this.target.getPreviousPosition(this.currentReactionTime);
+  }
+
+  shouldTrySomething() {
+    return (this.isTargetAiPlayer() &&
+      !this.boosting &&
+      Math.random() < 0.03 &&
+      this.notCatchingUp() &&
+      !this.isTryingSomething() &&
+      !this.target.isTryingSomething());
+  }
+
+  isTryingSomething() {
+    return this.isDoingWeirdMove() || this.isManeuvering();
+  }
+
+  isDoingWeirdMove() {
+    return this.stopDoingWeirdReverseMoveAt > this.scene.time.now;
   }
 
   isManeuvering() {
@@ -280,9 +327,10 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   notCatchingUp() {
-    if (this.aiTargetDistances.length < AI_TARGET_DISTANCE_HISTORY) {
+    if (this.aiTargetDistances.length < AI_TARGET_DISTANCE_HISTORY - this.aiTargetDistancesModifer) {
       return false;
     }
+    this.setRandomAiTargetDistancesModifer();
     return Math.max(...this.aiTargetDistances) - Math.min(...this.aiTargetDistances) < 45;
   }
 

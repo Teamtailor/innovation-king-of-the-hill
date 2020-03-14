@@ -588,6 +588,10 @@ export default class PlayerEntity {
     }
   }
 
+  hasPowerUp(powerUpName) {
+    return this.powerUps.filter(powerUp => powerUp.name === powerUpName).length > 0;
+  }
+
   addPowerUp(powerUp) {
     this.powerUps.push(powerUp);
     this.scene.updateScoreboard();

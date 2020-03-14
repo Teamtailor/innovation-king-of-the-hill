@@ -15,6 +15,7 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
   shouldDestroy = false;
   isConsumed = false;
   label = null;
+  name = null;
 
   constructor(scene, x, y, texture) {
     super(scene.matter.world, x, y, texture);
@@ -48,11 +49,12 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
 
   applyConfig() {
     const {
-      label, duration, svgScale
+      label, duration, svgScale, name
     } = POWER_UP_CONFIG.TYPES[
       this.constructor.name
     ];
 
+    this.name = name;
     this.label = label;
     this.effectLifeTime = duration;
     this.setScale(svgScale);
