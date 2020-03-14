@@ -543,8 +543,8 @@ export default class PlayerEntity {
       };
 
       this.jumpSensorConstraint.pointA = {
-        x: rotation.x * 72,
-        y: rotation.y * 72
+        x: rotation.x * (46 + this.matterObj.body.circleRadius),
+        y: rotation.y * (46 + this.matterObj.body.circleRadius)
       };
 
       this.jumpSensor.angle = this.velocityAngle;
