@@ -79,6 +79,16 @@ export default class PlayerEntity {
     }
   }
 
+  onAutoJumpSensorsChange() {
+    if (!this.isAlive) {
+      return;
+    }
+
+    if (!this.edgeSensorGrounds && this.jumpSensorGrounds && !this.boosting) {
+      this.boostUp();
+    }
+  }
+
   createEdgeSensor() {
     this.edgeSensor = this.scene.matter.add.circle(0, 0, 10, {
       isSensor: true,
@@ -91,13 +101,12 @@ export default class PlayerEntity {
 
     this.edgeSensor.onCollideCallback = () => {
       this.edgeSensorGrounds += 1;
+      this.onAutoJumpSensorsChange();
     };
 
     this.edgeSensor.onCollideEndCallback = () => {
       this.edgeSensorGrounds -= 1;
-      if (!this.edgeSensorGrounds && this.jumpSensorGrounds) {
-        this.boostUp();
-      }
+      this.onAutoJumpSensorsChange();
     };
 
     this.edgeSensorConstraint = this.scene.matter.add.constraint(
@@ -120,10 +129,12 @@ export default class PlayerEntity {
 
     this.jumpSensor.onCollideCallback = () => {
       this.jumpSensorGrounds += 1;
+      this.onAutoJumpSensorsChange();
     };
 
     this.jumpSensor.onCollideEndCallback = () => {
       this.jumpSensorGrounds -= 1;
+      this.onAutoJumpSensorsChange();
     };
 
     this.jumpSensorConstraint = this.scene.matter.add.constraint(
@@ -527,13 +538,13 @@ export default class PlayerEntity {
       );
 
       this.edgeSensorConstraint.pointA = {
-        x: rotation.x * -8,
-        y: rotation.y * -8
+        x: rotation.x * 0,
+        y: rotation.y * 0
       };
 
       this.jumpSensorConstraint.pointA = {
-        x: rotation.x * 75,
-        y: rotation.y * 75
+        x: rotation.x * 72,
+        y: rotation.y * 72
       };
 
       this.jumpSensor.angle = this.velocityAngle;
@@ -556,7 +567,10 @@ export default class PlayerEntity {
   updatePreviousPositions() {
     this.previousPositions.unshift(this.getPosition());
     if (this.previousPositions.length > GAME_CONFIG.PLAYER_POSITION_HISTORY) {
-      this.previousPositions = this.previousPositions.slice(0, GAME_CONFIG.PLAYER_POSITION_HISTORY);
+      this.previousPositions = this.previousPositions.slice(
+        0,
+        GAME_CONFIG.PLAYER_POSITION_HISTORY
+      );
     }
   }
 
@@ -636,7 +650,11 @@ export default class PlayerEntity {
     if (this.previousPositions.length === 0) {
       return this.getPosition();
     }
-    const index = Phaser.Math.Clamp(preferredStepsBack, 0, this.previousPositions.length - 1);
+    const index = Phaser.Math.Clamp(
+      preferredStepsBack,
+      0,
+      this.previousPositions.length - 1
+    );
     return this.previousPositions[index];
   }
 

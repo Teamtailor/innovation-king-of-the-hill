@@ -112,7 +112,10 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   updateTarget(time) {
-    if (this.shouldGetNewTarget()) {
+    if (this.isNearCliff()) {
+      this.matterObj.setVelocity(0, 0); // full break!
+      this.setTarget(this.findFarthestTarget(), time);
+    } else if (this.shouldGetNewTarget()) {
       this.setTarget(Math.random() < 0.2 ? this.findAnyTarget() : this.findSuitableTarget(), time);
     } else if (this.tiredOfChasing(time)) {
       this.setTarget(this.findSuitableTarget(this.target), time);
@@ -130,7 +133,7 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   shouldGetNewTarget() {
-    return this.target === null || !this.target.isActive || (!this.edgeSensorGrounds && this.jumpSensorGrounds && !this.boosting);
+    return this.target === null || !this.target.isActive;
   }
 
   tiredOfChasing(time) {
@@ -271,8 +274,16 @@ export default class AiPlayerEntity extends PlayerEntity {
     return this.scene.powerUpService.available;
   }
 
+  getAllPossibleTargets(excludedTarget) {
+    return this.getPossiblePlayerTargets(true, excludedTarget ? [excludedTarget.id] : []).concat(this.getPowerUpTargets());
+  }
+
   findSuitableTarget(excludedTarget) {
-    const possibleTargets = this.getPossiblePlayerTargets(true, excludedTarget ? [excludedTarget.id] : []).concat(this.getPowerUpTargets());
+    return this.findClosestTarget(excludedTarget);
+  }
+
+  findClosestTarget(excludedTarget) {
+    const possibleTargets = this.getAllPossibleTargets(excludedTarget);
     if (possibleTargets.length === 0) {
       return null;
     }
@@ -286,8 +297,25 @@ export default class AiPlayerEntity extends PlayerEntity {
         closestTarget = target;
       }
     });
-
     return closestTarget;
+  }
+
+  findFarthestTarget(excludedTarget) {
+    const possibleTargets = this.getAllPossibleTargets(excludedTarget);
+    if (possibleTargets.length === 0) {
+      return null;
+    }
+
+    let farthestTargetPosition = 0;
+    let farthestTarget = null;
+    possibleTargets.forEach(target => {
+      const distance = this.getDistanceToPoint(target.getPosition());
+      if (distance > farthestTargetPosition) {
+        farthestTargetPosition = distance;
+        farthestTarget = target;
+      }
+    });
+    return farthestTarget;
   }
 
   findAnyTarget() {
@@ -312,6 +340,10 @@ export default class AiPlayerEntity extends PlayerEntity {
     if (this.target && this.target.id === target.id) {
       this.target = null;
     }
+  }
+
+  isNearCliff() {
+    return !this.edgeSensorGrounds && !this.jumpSensorGrounds && !this.boosting;
   }
 
   updateLastCollision(collidedPlayer, collision) {
