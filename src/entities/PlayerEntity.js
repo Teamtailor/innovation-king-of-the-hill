@@ -87,7 +87,13 @@ export default class PlayerEntity {
     if (!this.edgeSensorGrounds && this.jumpSensorGrounds && !this.boosting) {
       this.boostUp();
     }
+
+    if (!this.edgeSensorGrounds && !this.jumpSensorGrounds) {
+      this.onCliffAhead();
+    }
   }
+
+  onCliffAhead() {}
 
   createEdgeSensor() {
     this.edgeSensor = this.scene.matter.add.circle(0, 0, 10, {
@@ -543,8 +549,16 @@ export default class PlayerEntity {
       };
 
       this.jumpSensorConstraint.pointA = {
-        x: rotation.x * (46 + this.matterObj.body.circleRadius),
-        y: rotation.y * (46 + this.matterObj.body.circleRadius)
+        x:
+          rotation.x *
+          (5 +
+            this.jumpSensor.centerOffset.x +
+            this.matterObj.body.circleRadius),
+        y:
+          rotation.y *
+          (5 +
+            this.jumpSensor.centerOffset.x +
+            this.matterObj.body.circleRadius)
       };
 
       this.jumpSensor.angle = this.velocityAngle;

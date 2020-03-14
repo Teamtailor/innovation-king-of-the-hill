@@ -111,11 +111,15 @@ export default class AiPlayerEntity extends PlayerEntity {
     this.shouldMakeStuckDescisionAt = 0;
   }
 
+  onCliffAhead() {
+    if (this.grounds.length) {
+      this.escapeTo = this.grounds[0].position;
+    }
+    this.target = null;
+  }
+
   updateTarget(time) {
-    if (this.isNearCliff()) {
-      this.matterObj.setVelocity(0, 0); // full break!
-      this.setTarget(this.findFarthestTarget(), time);
-    } else if (this.shouldGetNewTarget()) {
+    if (this.shouldGetNewTarget()) {
       this.setTarget(Math.random() < 0.2 ? this.findAnyTarget() : this.findSuitableTarget(), time);
     } else if (this.tiredOfChasing(time)) {
       this.setTarget(this.findSuitableTarget(this.target), time);
@@ -161,6 +165,14 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   getPointOfInterest(time) {
+    if (this.escapeTo) {
+      const e = new Phaser.Math.Vector2(this.escapeTo).subtract(this.getPosition());
+      if (e.length() > 16) {
+        return this.escapeTo;
+      }
+      this.escapeTo = null;
+    }
+
     if (!this.hasTarget()) {
       return this.scene.ground.sprite;
     }
@@ -340,10 +352,6 @@ export default class AiPlayerEntity extends PlayerEntity {
     if (this.target && this.target.id === target.id) {
       this.target = null;
     }
-  }
-
-  isNearCliff() {
-    return !this.edgeSensorGrounds && !this.jumpSensorGrounds && !this.boosting;
   }
 
   updateLastCollision(collidedPlayer, collision) {
