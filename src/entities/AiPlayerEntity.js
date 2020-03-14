@@ -349,24 +349,6 @@ export default class AiPlayerEntity extends PlayerEntity {
     return closestTarget;
   }
 
-  findFarthestTarget(excludedTarget) {
-    const possibleTargets = this.getAllPossibleTargets(excludedTarget);
-    if (possibleTargets.length === 0) {
-      return null;
-    }
-
-    let farthestTargetPosition = 0;
-    let farthestTarget = null;
-    possibleTargets.forEach(target => {
-      const distance = this.getDistanceToPoint(target.getPosition());
-      if (distance > farthestTargetPosition) {
-        farthestTargetPosition = distance;
-        farthestTarget = target;
-      }
-    });
-    return farthestTarget;
-  }
-
   findAnyTarget() {
     const possibleTargets = this.getPossiblePlayerTargets().concat(this.getPowerUpTargets());
     if (possibleTargets.length === 0) {
