@@ -11,13 +11,18 @@ const {
   DEFAULT_SPEED,
   SPEED_RANDOMNESS,
   AI_STUCK_LIMIT,
-  BOOST_THRESHOLD,
-  BOOST_DELAY_RANDOMNESS,
+  STUCK_BOOST_THRESHOLD,
+  STUCK_BOOST_DELAY_RANDOMNESS,
   BOOST_DIRECTION_MIN,
   BOOST_DIRECTION_MAX,
   DEFAULT_REACTION_TIME,
   REACTION_SPEED_RANDOMNESS,
-  AI_TARGET_DISTANCE_HISTORY
+  AI_TARGET_DISTANCE_HISTORY,
+  DEFAULT_RANDOM_BOOST_DISTANCE,
+  RANDOM_BOOST_DISTANCE_MODIFER,
+  RANDOM_BOOST_TIME_MIN,
+  RANDOM_BOOST_TIME_MAX,
+  RANDOM_BOOST_LIKELINESS
 } = GAME_CONFIG.AI;
 
 export default class AiPlayerEntity extends PlayerEntity {
@@ -32,6 +37,9 @@ export default class AiPlayerEntity extends PlayerEntity {
   lastMoveVector = null;
   shouldUpdateReactionTimeAt = 0;
   shouldMakeStuckDescisionAt = 0;
+  performRandomBoost = false;
+  nextRandomBoostPerformAt = 0;
+  nextRandomBoostDistanceThreshold = DEFAULT_RANDOM_BOOST_DISTANCE;
   currentReactionTime = DEFAULT_REACTION_TIME;
   aiTargetDistances = [];
 
@@ -54,7 +62,22 @@ export default class AiPlayerEntity extends PlayerEntity {
       this.updateReactionTime(time);
       this.updateTargetDistances(time);
       this.updateManeuver(time);
+      this.updateRandomBoost(time);
       this.move(time);
+    }
+  }
+
+  updateRandomBoost(time) {
+    if (time < this.nextRandomBoostPerformAt || !this.hasMovingTarget()) {
+      return;
+    }
+
+    if (this.getDistanceToPoint(this.target.getPosition()) < this.nextRandomBoostDistanceThreshold) {
+      if (Math.random() < RANDOM_BOOST_LIKELINESS) {
+        this.performRandomBoost = true;
+      } else {
+        this.setRandomBoostVars();
+      }
     }
   }
 
@@ -103,6 +126,7 @@ export default class AiPlayerEntity extends PlayerEntity {
   spawn() {
     super.spawn();
     this.resetManeuver();
+    this.setRandomBoostVars();
 
     this.escapeTo = null;
     this.target = null;
@@ -125,6 +149,13 @@ export default class AiPlayerEntity extends PlayerEntity {
     } else if (this.tiredOfChasing(time)) {
       this.setTarget(this.findSuitableTarget(this.target), time);
     }
+  }
+
+  setRandomBoostVars() {
+    const randomDistanceModifier = MathUtils.RandomSign(Phaser.Math.Between(0, RANDOM_BOOST_DISTANCE_MODIFER));
+    this.nextRandomBoostDistanceThreshold = DEFAULT_RANDOM_BOOST_DISTANCE + randomDistanceModifier;
+    this.nextRandomBoostPerformAt = this.scene.time.now + Phaser.Math.Between(RANDOM_BOOST_TIME_MIN, RANDOM_BOOST_TIME_MAX);
+    this.performRandomBoost = false;
   }
 
   setTarget(target, time) {
@@ -241,6 +272,10 @@ export default class AiPlayerEntity extends PlayerEntity {
       this.performBoostAt = null;
       this.lastBoostTime = time;
       this.matterObj.setAngularVelocity(Math.random() * 40 - 20);
+
+      if (this.performRandomBoost) {
+        this.setRandomBoostVars();
+      }
     }
   }
 
@@ -252,9 +287,10 @@ export default class AiPlayerEntity extends PlayerEntity {
   }
 
   shouldPerformBoost(time) {
-    return (this.performBoostAt &&
+    return (this.performRandomBoost ||
+      (this.performBoostAt &&
       this.performBoostAt < time &&
-      time > this.lastBoostTime + BOOST_THRESHOLD);
+      time > this.lastBoostTime + STUCK_BOOST_THRESHOLD));
   }
 
   getSpeed() {
@@ -411,7 +447,10 @@ export default class AiPlayerEntity extends PlayerEntity {
 
     if (rand > 5) {
       if (!this.boosting && !this.performBoostAt) {
-        this.performBoostAt = Phaser.Math.Between(BOOST_THRESHOLD * BOOST_DELAY_RANDOMNESS, BOOST_THRESHOLD) + this.scene.time.now;
+        this.performBoostAt = Phaser.Math.Between(
+          STUCK_BOOST_THRESHOLD * STUCK_BOOST_DELAY_RANDOMNESS,
+          STUCK_BOOST_THRESHOLD
+        ) + this.scene.time.now;
       }
     } else if (rand > 2) {
       this.doManeuver();
