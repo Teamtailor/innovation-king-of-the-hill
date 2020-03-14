@@ -104,6 +104,7 @@ export default class AiPlayerEntity extends PlayerEntity {
     super.spawn();
     this.resetManeuver();
 
+    this.escapeTo = null;
     this.target = null;
     this.lastCollision = null;
     this.currentReactionTime = DEFAULT_REACTION_TIME;
