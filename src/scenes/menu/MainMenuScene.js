@@ -74,7 +74,7 @@ class MainMenuScene extends BaseScene {
     buttons[2].on('pointerout', this.disableHover);
     buttons[3].on('pointerout', this.disableHover);
 
-    this.listenToSocket();
+    // this.listenToSocket();
   }
 
   listenToSocket() {
@@ -147,7 +147,7 @@ class MainMenuScene extends BaseScene {
     let printStartPositionY = 500;
     const printStartPositionX = 760;
     const tableSpace = 130;
-    
+
     this.clearPlayersList();
 
     players.map(player => {
