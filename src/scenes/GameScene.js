@@ -27,6 +27,11 @@ class GameScene extends BaseScene {
 
     this.scene.launch('UiScene', this);
 
+    this.battleMusic = this.sound.add('battlemusic');
+    this.battleMusic.play({
+      loop: true
+    });
+
     const escButton = this.input.keyboard.addKey('esc');
     this.adjustCamera();
     this.scale.on('resize', this.resize, this);

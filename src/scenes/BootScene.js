@@ -2,6 +2,9 @@ import MainMenuScene from './menu/MainMenuScene';
 import RulesScene from './menu/RulesScene';
 import GameScene from './GameScene';
 import UiScene from './UiScene';
+import {
+  LEVELS
+} from '../config/constants';
 
 class BootScene extends Phaser.Scene {
   constructor() {
@@ -102,6 +105,7 @@ class BootScene extends Phaser.Scene {
 
     // Sounds
     this.load.audio('ClickSound', 'assets/sounds/click.mp3');
+    this.load.audio('battlemusic', 'assets/sounds/kingofthehill.mp3');
   }
 
   create() {
@@ -110,7 +114,7 @@ class BootScene extends Phaser.Scene {
     this.scene.add('GameScene', GameScene);
     this.scene.add('UiScene', UiScene);
 
-    this.scene.start('MainMenuScene');
+    this.scene.start('GameScene', LEVELS.crazy);
   }
 }
 

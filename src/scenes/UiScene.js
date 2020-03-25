@@ -83,9 +83,9 @@ class UiScene extends BaseScene {
     join3.label.setPosition(this.game.config.width - 150, 50);
 
     const join4 = new PressToJoin(this, this.gameScene, {
-      text: 'PRESS + TO ADD AI PLAYER',
+      text: 'PRESS P TO ADD AI PLAYER',
       useAi: true,
-      joinButton: 'plus',
+      joinButton: 'p',
       maxAdd: 4
     });
     join4.label.setOrigin(1, 0.5);
