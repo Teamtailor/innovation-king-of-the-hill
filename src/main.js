@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import io from 'socket.io-client';
 import constants from './config/constants';
 import BootScene from './scenes/BootScene';
 

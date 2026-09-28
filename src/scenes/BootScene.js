@@ -14,7 +14,7 @@ class BootScene extends Phaser.Scene {
   }
 
   preload() {
-    var progress = this.add.graphics();
+    const progress = this.add.graphics();
     this.cameras.main.setBackgroundColor(0x183274);
 
     this.load.on('progress', value => {
@@ -32,7 +32,7 @@ class BootScene extends Phaser.Scene {
       progress.destroy();
     });
 
-    for (var i = 0; i < 10; i++) {
+    for (let i = 0; i < 10; i++) {
       this.load.image('avatar' + i, '//robohash.org/' + i + '?size=480x480');
     }
 

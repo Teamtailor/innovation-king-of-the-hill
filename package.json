@@ -1,44 +1,27 @@
 {
-  "name": "Phaser3-Test",
+  "name": "king-of-the-hill",
   "version": "0.0.0",
   "description": "",
   "author": "Teamtailor",
-  "main": "index.js",
   "scripts": {
-    "start": "webpack --mode=development ",
-    "startprodtest": "webpack --mode=development  --config webpack.productiontest.config.js",
-    "build": "webpack  --mode=production --config webpack.production.config.js",
-    "multiplayer": "yarn build && node socket/app.js",
-    "test": "eslint ./src/**/**.js",
-    "lint": "eslint src --max-warnings 0",
-    "lintfix": "yarn lint -- --fix"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --max-warnings 0"
   },
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^7.8.7",
-    "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/preset-env": "^7.8.7",
-    "babel-eslint": "^10.1.0",
-    "babel-loader": "^8.0.6",
-    "browser-sync": "^2.26.7",
-    "browser-sync-webpack-plugin": "^2.2.2",
-    "clean-webpack-plugin": "^3.0.0",
-    "copy-webpack-plugin": "^5.1.1",
-    "eslint": "^6.8.0",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-node": "^11.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "expose-loader": "^0.7.5",
-    "html-webpack-plugin": "^3.2.0",
-    "raw-loader": "^4.0.0",
-    "webpack": "^4.42.0",
-    "webpack-cli": "^3.3.11"
+    "eslint": "^9",
+    "globals": "^17.12.0",
+    "neostandard": "^0.13.0",
+    "vite": "^8.3.1"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "phaser": "3.22.0",
-    "socket.io-client": "^2.3.0"
+    "phaser": "3.22.0"
+  },
+  "private": true,
+  "type": "module",
+  "volta": {
+    "node": "24.16.0"
   }
 }

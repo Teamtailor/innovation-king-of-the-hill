@@ -8,7 +8,6 @@ const fov = 20;
 const baseSpeed = 0.025;
 let speed = 0;
 let warpSpeed = 0;
-const starStretch = 5;
 const starBaseSize = 0.1;
 
 export default class StarBackgroundEntity {

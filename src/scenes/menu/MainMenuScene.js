@@ -150,7 +150,7 @@ class MainMenuScene extends BaseScene {
 
     this.clearPlayersList();
 
-    players.map(player => {
+    players.forEach(player => {
       const playerElement = {};
       if (printedUsersCount < maxPlayersCount) {
         playerElement.level = this.add.text(printStartPositionX, printStartPositionY, player.level, {
@@ -176,7 +176,7 @@ class MainMenuScene extends BaseScene {
   }
 
   clearPlayersList() {
-    this.playersList.map(player => {
+    this.playersList.forEach(player => {
       player.level.destroy();
       player.name.destroy();
     });

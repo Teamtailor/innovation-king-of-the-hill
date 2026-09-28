@@ -16,7 +16,7 @@ export default class GroundEntity {
   }) {
     this.scene = scene;
 
-    var shapes = this.scene.cache.json.get('shapes');
+    const shapes = this.scene.cache.json.get('shapes');
 
     this.sprite = this.scene.matter.add.sprite(
       scene.game.config.width / 2,
@@ -104,7 +104,7 @@ export default class GroundEntity {
       tile.position.x - width / 2,
       tile.position.y - height / 2,
       width - POINT_EDGE_MARGIN * 2,
-      height - POINT_EDGE_MARGIN * 2,
+      height - POINT_EDGE_MARGIN * 2
     )).getRandomPoint();
   }
 }

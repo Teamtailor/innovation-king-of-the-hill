@@ -43,6 +43,9 @@ export default class PowerUpBase extends Phaser.Physics.Matter.Sprite {
     return this.body ? this.body.collisionFilter.category : undefined;
   }
 
+  // Phaser's GameObject constructor assigns this.type; ignore it (throws in strict mode without a setter).
+  set type(_) {}
+
   get isActive() {
     return !this.shouldDestroy && !this.isConsumed && this.body;
   }

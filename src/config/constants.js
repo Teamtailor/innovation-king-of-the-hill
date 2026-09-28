@@ -9,7 +9,7 @@ const SCALE = 1;
 export default {
   WIDTH: 1280 * SCALE,
   HEIGHT: 950 * SCALE,
-  SCALE: SCALE
+  SCALE
 };
 
 export const GAME_CONFIG = {
